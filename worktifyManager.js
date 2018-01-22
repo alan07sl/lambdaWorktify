@@ -3,6 +3,7 @@ var querystring = require('querystring');
 var http = require('http');
 var https = require('https');
 var fs = require('fs');
+var redis = require('redis');
 
 /**
 * @param context {WebtaskContext}
@@ -12,8 +13,43 @@ module.exports = function(context, cb) {
   const clientId = '3b8e56b6553f442aa483fe488eca5b30';
   const clientSecret = '2d9c70863026407db705645ad2f2aaf5';
   const webTaskUrl = 'https://wt-1421b0d761ddd832608482e64eb8e4fc-0.run.webtask.io/worktify-main';
-  const spotifyAccountServiceHost = 'accounts.spotify.com'
-  const spotifyAccountServicePath = '/api/token'
+  const spotifyAccountServiceHost = 'accounts.spotify.com';
+  const spotifyAccountServicePath = '/api/token';
+
+  const apiHost = 'api.spotify.com';
+  const volumePath = '/v1/me/player/volume';
+
+  const redisHostname = 'redis-10642.c15.us-east-1-4.ec2.cloud.redislabs.com';
+  const redisPort = 10642;
+  const redisPassword = 'Graion.0';
+  const redisAccessToken = 'access_token';
+
+  var access_token;
+  var token_type;
+  var scope;
+  var expires_in;
+  var refresh_token;
+
+  /* Redis Client */
+
+  var client = redis.createClient(redisPort, redisHostname, {no_ready_check: true});
+  client.auth(redisPassword, function (err) {
+      if (err) throw err;
+  });
+
+  function redisSet(key, value) {
+    client.set(key, value, redis.print);
+    client.get(key, function (err, reply) {
+          if (err) throw err;
+    });
+  }
+
+  function redisGet(key) {
+    client.get(key, function(error, result) {
+        if (error) console.log('Error: '+ error);
+        else access_token = result;
+    });
+  }
 
   if(typeof context.body !== "undefined") {
 
@@ -82,13 +118,47 @@ module.exports = function(context, cb) {
     var post_req = https.request(post_options, function(res) {
         res.setEncoding('utf8');
         res.on('data', function (chunk) {
-            console.log('Response: ' + chunk);
+            var obj = JSON.parse(chunk);
+            redisSet(redisAccessToken, obj.access_token);
+            token_type = obj.token_type;
+            scope = obj.scope;
+            expires_in = obj.expires_in;
+            refresh_token = obj.refresh_token;
         });
     });
 
     // post the data
     post_req.write(post_data);
     post_req.end();
+  }
+
+  function PutVolume(volume) {
+    // Build the post string from an object
+    var put_data = querystring.stringify({
+        'volume' : volume
+    });
+
+    // An object of options to indicate where to post to
+    var put_options = {
+        host: apiHost,
+        path: volumePath,
+        method: 'PUT',
+        headers: {
+            'Authorization': 'Bearer ' + access_token
+        }
+    };
+
+    // Set up the request
+    var put_req = https.request(put_options, function(res) {
+        res.setEncoding('utf8');
+        res.on('data', function (chunk) {
+            console.log('Response: ' + chunk);
+        });
+    });
+
+    // put the data
+    put_req.write(put_data);
+    put_req.end();
   }    
   
   
@@ -110,15 +180,20 @@ module.exports = function(context, cb) {
     }
   }
   
-  function volume(argsArray) {
+  function volume(volume) {
     var percentage = argsArray[1];
     if(argsArray.length == 2 && percentage >= 0 && percentage<= 100) {
-      cb(null, util.format('You set the volume to %d%', percentage));
+      redisGet(redisAccessToken);
+      console.log('lee aca gil ' + access_token);
+      if(access_token != -1){
+        PutVolume(volume);
+        cb(null, util.format('You set the volume to %d%', percentage));
+      } else{
+          cb(null, 'Please, login first.');
+      }
     } else {
       cb(null, 'Volume command just recives an argument with range is 0-100');
     }
   }
   
 };
-
-

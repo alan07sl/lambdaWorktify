@@ -10,8 +10,8 @@ var redis = require('redis');
 */
 module.exports = function(context, cb) {
   const authorizeUrl = 'https://accounts.spotify.com/authorize?client_id=%s&response_type=code&redirect_uri=%s&scope=user-modify-playback-state';
-  const clientId = '3b8e56b6553f442aa483fe488eca5b30';
-  const clientSecret = '2d9c70863026407db705645ad2f2aaf5';
+  const clientId = context.secrets.client_id;
+  const clientSecret = context.secrets.client_secret;
   const webTaskUrl = 'https://wt-1421b0d761ddd832608482e64eb8e4fc-0.run.webtask.io/worktify-main';
   const spotifyAccountServiceHost = 'accounts.spotify.com';
   const spotifyAccountServicePath = '/api/token';
@@ -21,7 +21,7 @@ module.exports = function(context, cb) {
 
   const redisHostname = 'redis-10642.c15.us-east-1-4.ec2.cloud.redislabs.com';
   const redisPort = 10642;
-  const redisPassword = 'Graion.0';
+  const redisPassword = context.secrets.redis_password;
   const redisAccessToken = 'access_token';
 
   var access_token;
@@ -48,7 +48,7 @@ module.exports = function(context, cb) {
     return new Promise((success, err) => {
       client.get(key, function(error, result) {
           if (error) 
-            reject(Error("Problema con Redis GIL"));
+            reject(Error("Redis failed."));
           else {
             access_token = result;
             success(result);
@@ -77,24 +77,25 @@ module.exports = function(context, cb) {
           volume(argsArray);
           break;
         case 'oncall on':
-          cb(null, 'Seteaste oncall on');
+          cb(null, 'Set oncall on');
           break;
           case 'oncall off':
-          cb(null, 'Seteaste oncall off');
+          cb(null, 'Set oncall off');
           break;
         case 'help':
-          cb(null, 'Texto de ayuda');
+          cb(null, 'Help text.');
           break;
         default:
-          cb(null,'Para más información sobre las funcionalidades de worktify por favor usa /worktify help');
+          cb(null,'For more usage information please use: /worktify help');
         break;
       }
     } else {
-        cb(null, 'Para más información sobre las funcionalidades de worktify por favor usa /worktify help'); 
+        cb(null, 'For more usage information please use: /worktify help'); 
     }
   } else { //if we don't have that then we need to check if it's the callback of spotify.
       if(typeof context.query.code !== "undefined") {
         PostCode(context.query.code);
+        cb(null, 'You logged in. You can close this tab.'); 
       }
   }
     
@@ -179,6 +180,7 @@ module.exports = function(context, cb) {
   
   function logout(len) {
     if(len == 1) {
+      redisSet(redisAccessToken, '-1');
       cb(null, 'You have logged out, thanks for using worktify.'); 
     } else {
       cb(null, 'Logout command must have no parameters.');
@@ -196,7 +198,7 @@ module.exports = function(context, cb) {
             cb(null, 'Please, login first.');
         }
       }).catch(()=> {
-        console.log('Redis fallo.');
+        console.log('Redis failed.');
       });
     } else {
       cb(null, 'Volume command just recives an argument with range is 0-100');

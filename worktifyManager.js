@@ -17,7 +17,7 @@ module.exports = function(context, cb) {
   const spotifyAccountServicePath = '/api/token';
 
   const apiHost = 'api.spotify.com';
-  const volumePath = '/v1/me/player/volume';
+  const volumePath = '/v1/me/player/volume?volume_percent=';
 
   const redisHostname = 'redis-10642.c15.us-east-1-4.ec2.cloud.redislabs.com';
   const redisPort = 10642;
@@ -45,10 +45,16 @@ module.exports = function(context, cb) {
   }
 
   function redisGet(key) {
-    client.get(key, function(error, result) {
-        if (error) console.log('Error: '+ error);
-        else access_token = result;
-    });
+    return new Promise((success, err) => {
+      client.get(key, function(error, result) {
+          if (error) 
+            reject(Error("Problema con Redis GIL"));
+          else {
+            access_token = result;
+            success(result);
+          }
+      });
+    });    
   }
 
   if(typeof context.body !== "undefined") {
@@ -135,13 +141,12 @@ module.exports = function(context, cb) {
   function PutVolume(volume) {
     // Build the post string from an object
     var put_data = querystring.stringify({
-        'volume' : volume
     });
 
     // An object of options to indicate where to post to
     var put_options = {
         host: apiHost,
-        path: volumePath,
+        path: volumePath + volume,
         method: 'PUT',
         headers: {
             'Authorization': 'Bearer ' + access_token
@@ -180,17 +185,19 @@ module.exports = function(context, cb) {
     }
   }
   
-  function volume(volume) {
+  function volume(argsArray) {
     var percentage = argsArray[1];
     if(argsArray.length == 2 && percentage >= 0 && percentage<= 100) {
-      redisGet(redisAccessToken);
-      console.log('lee aca gil ' + access_token);
-      if(access_token != -1){
-        PutVolume(volume);
-        cb(null, util.format('You set the volume to %d%', percentage));
-      } else{
-          cb(null, 'Please, login first.');
-      }
+      redisGet(redisAccessToken).then(()=> {
+        if(access_token != -1){
+          PutVolume(percentage);
+          cb(null, util.format('You set the volume to %d%', percentage));
+        } else{
+            cb(null, 'Please, login first.');
+        }
+      }).catch(()=> {
+        console.log('Redis fallo.');
+      });
     } else {
       cb(null, 'Volume command just recives an argument with range is 0-100');
     }

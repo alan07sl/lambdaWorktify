@@ -168,7 +168,20 @@ module.exports = function(context, cb) {
   }    
 
 var getSong = new Promise((resolve, reject) =>{
-    resolve({item:"hola"})
+    // An object of options to indicate where to post to
+    var get_options = {
+        host: apiHost,
+        path: v1Player,
+        method: 'GET',
+        headers: {
+            'Authorization': 'Bearer ' + access_token
+        }
+    };
+    // do a thing, possibly async, then…
+    var get_req = https.request(get_options, function(res) {
+        res.setEncoding('utf8');
+        resolve(res.body)
+    });
 }); 
   
   /* Functions to handle each command. */

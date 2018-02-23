@@ -166,9 +166,9 @@ module.exports = function(context, cb) {
     });
     put_req.end();
   }    
-  
- let getSong = new Promise(function(resolve, reject){
 
+function getSong(resolve,reject) {
+ new Promise(function(resolve, reject){
     // An object of options to indicate where to post to
     var get_options = {
         host: apiHost,
@@ -187,7 +187,8 @@ module.exports = function(context, cb) {
         resolve(res.data);
     });
     //get_req.end();
-  });
+  }); 
+}
   
   /* Functions to handle each command. */
   

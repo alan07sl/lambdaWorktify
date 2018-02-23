@@ -168,7 +168,7 @@ module.exports = function(context, cb) {
   }    
 
 function getSong(resolve,reject) {
- new Promise(function(resolve, reject){
+ return new Promise(function(resolve, reject){
     // An object of options to indicate where to post to
     var get_options = {
         host: apiHost,
@@ -231,8 +231,10 @@ function getSong(resolve,reject) {
     if(len == 1) {
       redisGet(redisAccessToken).then(()=> {
         if(access_token != -1){
-          cb(null,"Kimosabeeee")
-          
+           getSong().then((data)=> {
+            console.log(data);
+            cb(null, util.format('You are currently listening to %s%', data.item.name));  
+          });
         } else{
             cb(null, 'Please, login first.');
         }

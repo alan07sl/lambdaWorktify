@@ -168,27 +168,7 @@ module.exports = function(context, cb) {
         });
     });
     put_req.end();
-  }    
-
-var getSong = new Promise((resolve, reject) =>{
-    // An object of options to indicate where to post to
-    var get_options = {
-        host: apiHost,
-        path: v1Player,
-        method: 'GET',
-        headers: {
-            'Authorization': 'Bearer ' + access_token
-        }
-    };
-    // do a thing, possibly async, then…
-    var get_req = https.request(get_options, function(res) {
-        res.setEncoding('utf8');
-        resolve(data)
-    });
-    put_req.end();
-    
-
-}); 
+  }
   
   /* Functions to handle each command. */
   
@@ -215,7 +195,7 @@ var getSong = new Promise((resolve, reject) =>{
       redisGet(redisAccessToken).then(()=> {
         if(access_token != -1){
           PutVolume(percentage);
-          cb(null, util.format('!asd You set the volume to %d%', percentage));
+          cb(null, util.format('You set the volume to %d%.', percentage));
         } else{
             cb(null, 'Please, login first.');
         }
@@ -223,7 +203,7 @@ var getSong = new Promise((resolve, reject) =>{
         console.log('Redis failed.');
       });
     } else {
-      cb(null, 'Volume command just recives an argument with range is 0-100');
+      cb(null, 'Volume command just recives an argument with range is 0-100.');
     }
   }
 
@@ -236,13 +216,15 @@ var getSong = new Promise((resolve, reject) =>{
                       'Authorization': 'Bearer ' + access_token
                   }}).then((response)=> {
             console.log(response);
-            cb(null, util.format('You are currently listening to %s%', response.data.item.name));  
+            cb(null, util.format('You are currently listening to %s.', response.data.item.name));  
+          }).catch(()=>{
+            console.log('Cant reach Spotify API.')
           });
         } else{
             cb(null, 'Please, login first.');
         }
       }).catch(()=> {
-        console.log('puto');
+        console.log('Cant reach redis.');
       });
     } else {
       cb(null, 'Whatson command does not recive any parameters.');

@@ -177,9 +177,9 @@ module.exports = function(context, cb) {
     if(argsArray.length == 2 && percentage >= 0 && percentage<= 100) {
       redisGet(redisAccessToken).then((access_token)=> {
         if(access_token != -1){
-          axios.put(httpsHost + volumePath + percentage,{headers: {
+          axios.put(httpsHost + volumePath + percentage,{},{headers: {
                       'Authorization': 'Bearer ' + access_token
-                  }}).then((response)=> {
+                  }}).then(()=> {
             cb(null, util.format('You set the volume to %d%.', percentage));  
           }).catch(()=>{
             console.log('Cant reach Spotify API.')

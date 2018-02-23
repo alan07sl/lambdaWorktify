@@ -4,6 +4,9 @@ var http = require('http');
 var https = require('https');
 var fs = require('fs');
 var redis = require('redis');
+const axios = require('axios@0.15.2')
+
+
 
 /**
 * @param context {WebtaskContext}
@@ -183,6 +186,8 @@ var getSong = new Promise((resolve, reject) =>{
         resolve(data)
     });
     put_req.end();
+    
+
 }); 
   
   /* Functions to handle each command. */
@@ -226,7 +231,9 @@ var getSong = new Promise((resolve, reject) =>{
     if(len == 1) {
       redisGet(redisAccessToken).then(()=> {
         if(access_token != -1){
-           getSong.then((data)=> {
+           axios.get(apiHost+v1Player,null,{headers: {
+                      'Authorization': 'Bearer ' + access_token
+                  }}).then((data)=> {
             console.log(data);
             cb(null, util.format('You are currently listening to %s%', data));  
           });

@@ -167,11 +167,9 @@ module.exports = function(context, cb) {
     put_req.end();
   }    
 
-function getSong(resolve,reject) {
- return new Promise(function(resolve, reject){
-    resolve("Hello kimosabeee");   
-  });
-}
+var getSong = new Promise((resolve, reject) =>{
+    resolve({item:"hola"})
+}); 
   
   /* Functions to handle each command. */
   
@@ -216,7 +214,7 @@ function getSong(resolve,reject) {
         if(access_token != -1){
            getSong().then((data)=> {
             console.log(data);
-            cb(null, util.format('You are currently listening to %s%', data));  
+            cb(null, util.format('You are currently listening to %s%', data.item));  
           });
         } else{
             cb(null, 'Please, login first.');

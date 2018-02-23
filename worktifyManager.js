@@ -232,7 +232,7 @@ var getSong = new Promise((resolve, reject) =>{
       redisGet(redisAccessToken).then(()=> {
         if(access_token != -1){
           console.log(apiHost+v1Player);
-           axios.get(apiHost+v1Player,{headers: {
+           axios.get('https://'+apiHost+v1Player,{headers: {
                       'Authorization': 'Bearer ' + access_token
                   }}).then((response)=> {
             console.log(response);

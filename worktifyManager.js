@@ -231,6 +231,7 @@ var getSong = new Promise((resolve, reject) =>{
     if(len == 1) {
       redisGet(redisAccessToken).then(()=> {
         if(access_token != -1){
+          console.log(apiHost+v1Player);
            axios.get(apiHost+v1Player,{headers: {
                       'Authorization': 'Bearer ' + access_token
                   }}).then((response)=> {
@@ -241,7 +242,7 @@ var getSong = new Promise((resolve, reject) =>{
             cb(null, 'Please, login first.');
         }
       }).catch(()=> {
-        console.log('');
+        console.log('puto');
       });
     } else {
       cb(null, 'Whatson command does not recive any parameters.');

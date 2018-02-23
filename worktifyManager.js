@@ -216,7 +216,7 @@ module.exports = function(context, cb) {
                       'Authorization': 'Bearer ' + access_token
                   }}).then((response)=> {
             console.log(response);
-            cb(null, util.format('You are currently listening to %s.', response.data.item.name));  
+            cb(null, util.format('You are currently listening to %s. from %s', response.data.item.name, response.data.item.artists[0].name));  
           }).catch(()=>{
             console.log('Cant reach Spotify API.')
           });
@@ -224,7 +224,7 @@ module.exports = function(context, cb) {
             cb(null, 'Please, login first.');
         }
       }).catch(()=> {
-        console.log('Cant reach redis.');
+        console.log('Redis failed.');
       });
     } else {
       cb(null, 'Whatson command does not recive any parameters.');

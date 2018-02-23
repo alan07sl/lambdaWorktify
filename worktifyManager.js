@@ -236,7 +236,7 @@ var getSong = new Promise((resolve, reject) =>{
                       'Authorization': 'Bearer ' + access_token
                   }}).then((response)=> {
             console.log(response);
-            cb(null, util.format('You are currently listening to %s%', response.data));  
+            cb(null, util.format('You are currently listening to %s%', response.data.item.name));  
           });
         } else{
             cb(null, 'Please, login first.');

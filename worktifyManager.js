@@ -231,7 +231,8 @@ function getSong(resolve,reject) {
     if(len == 1) {
       redisGet(redisAccessToken).then(()=> {
         if(access_token != -1){
-          GetSong().then((data)=> {
+          getSong().then((data)=> {
+            console.log(data);
             cb(null, util.format('You are currently listening to %s%', data.item.name));  
           });
           

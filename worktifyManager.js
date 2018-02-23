@@ -169,27 +169,8 @@ module.exports = function(context, cb) {
 
 function getSong(resolve,reject) {
  return new Promise(function(resolve, reject){
-    // An object of options to indicate where to post to
-    var get_options = {
-        host: apiHost,
-        path: v1Player,
-        method: 'GET',
-        headers: {
-            'Authorization': 'Bearer ' + access_token
-        }
-    };
-    // do a thing, possibly async, then…
-    var tuviejaresponse
-    var get_req = https.request(get_options, function(res) {
-        res.setEncoding('utf8');
-        res.on('data', function (chunk) {
-            console.log('Response: ' + chunk);
-        });
-        tuviejaresponse=res;
-    });
-    resolve(res.data);
-    get_req.end();
-  }); 
+    cb(null,"Hello kimosabeee");   
+  });
 }
   
   /* Functions to handle each command. */

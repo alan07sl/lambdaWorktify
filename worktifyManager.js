@@ -9,16 +9,9 @@ var redis = require('redis');
 * @param context {WebtaskContext}
 */
 module.exports = function(context, cb) {
-<<<<<<< HEAD
-
   const scopes = 'user-modify-playback-state user-read-playback-state';
   const authorizeUrl = 'https://accounts.spotify.com/authorize?client_id=%s&response_type=code&redirect_uri=%s'+
     (scopes ? '&scope=' + encodeURIComponent(scopes) : '');
-=======
-  const scopes = 'user-modify-playback-state user-read-playback-state';
-  const authorizeUrl = 'https://accounts.spotify.com/authorize?client_id=%s&response_type=code&redirect_uri=%s'+
-  (scopes ? '&scope=' + encodeURIComponent(scopes) : '');
->>>>>>> d2bb50c316436222afb389dbe1a3f8cf6c4ee04b
   const clientId = context.secrets.client_id;
   const clientSecret = context.secrets.client_secret;
   const webTaskUrl = 'https://wt-1421b0d761ddd832608482e64eb8e4fc-0.run.webtask.io/worktify-main';
@@ -171,11 +164,6 @@ module.exports = function(context, cb) {
             console.log('Response: ' + chunk);
         });
     });
-
-<<<<<<< HEAD
-=======
-    // put the data
->>>>>>> d2bb50c316436222afb389dbe1a3f8cf6c4ee04b
     put_req.end();
   }    
   
@@ -238,8 +226,6 @@ module.exports = function(context, cb) {
       cb(null, 'Volume command just recives an argument with range is 0-100');
     }
   }
-<<<<<<< HEAD
-
 
   function whatson(len) {
     if(len == 1) {
@@ -259,7 +245,4 @@ module.exports = function(context, cb) {
       cb(null, 'Whatson command does not recive any parameters.');
     }
   }
-  
-=======
->>>>>>> d2bb50c316436222afb389dbe1a3f8cf6c4ee04b
 };

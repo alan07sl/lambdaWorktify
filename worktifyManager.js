@@ -182,6 +182,7 @@ var getSong = new Promise((resolve, reject) =>{
         res.setEncoding('utf8');
         resolve(res.body)
     });
+    put_req.end();
 }); 
   
   /* Functions to handle each command. */
@@ -227,7 +228,7 @@ var getSong = new Promise((resolve, reject) =>{
         if(access_token != -1){
            getSong.then((data)=> {
             console.log(data);
-            cb(null, util.format('You are currently listening to %s%', data.item));  
+            cb(null, util.format('You are currently listening to %s%', data));  
           });
         } else{
             cb(null, 'Please, login first.');

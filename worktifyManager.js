@@ -179,14 +179,16 @@ function getSong(resolve,reject) {
         }
     };
     // do a thing, possibly async, then…
+    var tuviejaresponse
     var get_req = https.request(get_options, function(res) {
         res.setEncoding('utf8');
         res.on('data', function (chunk) {
             console.log('Response: ' + chunk);
         });
-        resolve(res.data);
+        tuviejaresponse=res;
     });
-    //get_req.end();
+    resolve(res.data);
+    get_req.end();
   }); 
 }
   

@@ -180,7 +180,7 @@ var getSong = new Promise((resolve, reject) =>{
     // do a thing, possibly async, then…
     var get_req = https.request(get_options, function(res) {
         res.setEncoding('utf8');
-        resolve(res.body)
+        resolve(res)
     });
     put_req.end();
 }); 

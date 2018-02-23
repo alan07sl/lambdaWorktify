@@ -30,7 +30,6 @@ module.exports = function(context, cb) {
   const redisPassword = context.secrets.redis_password;
   const redisAccessToken = 'access_token';
 
-  var access_token;
   var token_type;
   var scope;
   var expires_in;
@@ -56,7 +55,6 @@ module.exports = function(context, cb) {
           if (error) 
             reject(Error("Redis failed."));
           else {
-            access_token = result;
             success(result);
           }
       });
@@ -182,8 +180,14 @@ module.exports = function(context, cb) {
   
   function logout(len) {
     if(len == 1) {
-      redisSet(redisAccessToken, '-1');
-      cb(null, 'You have logged out, thanks for using worktify.'); 
+      redisGet(redisAccessToken).then((access_token)=> {
+      if(access_token != '-1') {
+        redisSet(redisAccessToken, '-1');
+      } else {
+        cb(null, 'You were not logged in.')
+      }
+      cb(null, 'You have logged out, thanks for using worktify.');
+      });
     } else {
       cb(null, 'Logout command must have no parameters.');
     }
@@ -192,7 +196,7 @@ module.exports = function(context, cb) {
   function volume(argsArray) {
     var percentage = argsArray[1];
     if(argsArray.length == 2 && percentage >= 0 && percentage<= 100) {
-      redisGet(redisAccessToken).then(()=> {
+      redisGet(redisAccessToken).then((access_token)=> {
         if(access_token != -1){
           PutVolume(percentage);
           cb(null, util.format('You set the volume to %d%.', percentage));
@@ -209,14 +213,14 @@ module.exports = function(context, cb) {
 
   function whatson(len) {
     if(len == 1) {
-      redisGet(redisAccessToken).then(()=> {
+      redisGet(redisAccessToken).then((access_token)=> {
         if(access_token != -1){
           console.log(apiHost+v1Player);
            axios.get('https://'+apiHost+v1Player,{headers: {
                       'Authorization': 'Bearer ' + access_token
                   }}).then((response)=> {
             console.log(response);
-            cb(null, util.format('You are currently listening to %s. from %s', response.data.item.name, response.data.item.artists[0].name));  
+            cb(null, util.format('You are currently listening to %s from %s.', response.data.item.name, response.data.item.artists[0].name));  
           }).catch(()=>{
             console.log('Cant reach Spotify API.')
           });

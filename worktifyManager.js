@@ -9,7 +9,10 @@ var redis = require('redis');
 * @param context {WebtaskContext}
 */
 module.exports = function(context, cb) {
-  const authorizeUrl = 'https://accounts.spotify.com/authorize?client_id=%s&response_type=code&redirect_uri=%s&scope=user-modify-playback-state';
+
+  const scopes = 'user-modify-playback-state user-read-playback-state';
+  const authorizeUrl = 'https://accounts.spotify.com/authorize?client_id=%s&response_type=code&redirect_uri=%s'+
+    (scopes ? '&scope=' + encodeURIComponent(scopes) : '');
   const clientId = context.secrets.client_id;
   const clientSecret = context.secrets.client_secret;
   const webTaskUrl = 'https://wt-1421b0d761ddd832608482e64eb8e4fc-0.run.webtask.io/worktify-main';
@@ -17,7 +20,8 @@ module.exports = function(context, cb) {
   const spotifyAccountServicePath = '/api/token';
 
   const apiHost = 'api.spotify.com';
-  const volumePath = '/v1/me/player/volume?volume_percent=';
+  const v1Player = '/v1/me/player'
+  const volumePath = v1Player + '/volume?volume_percent=';
 
   const redisHostname = 'redis-10642.c15.us-east-1-4.ec2.cloud.redislabs.com';
   const redisPort = 10642;
@@ -75,6 +79,9 @@ module.exports = function(context, cb) {
           break;
         case 'volume':
           volume(argsArray);
+          break;
+        case 'whatson':
+          whatson();
           break;
         case 'oncall on':
           cb(null, 'Set oncall on');
@@ -140,9 +147,6 @@ module.exports = function(context, cb) {
   }
 
   function PutVolume(volume) {
-    // Build the post string from an object
-    var put_data = querystring.stringify({
-    });
 
     // An object of options to indicate where to post to
     var put_options = {
@@ -162,11 +166,31 @@ module.exports = function(context, cb) {
         });
     });
 
-    // put the data
-    put_req.write(put_data);
     put_req.end();
   }    
   
+  function GetSong() {
+
+    // An object of options to indicate where to post to
+    var get_options = {
+        host: apiHost,
+        path: v1Player,
+        method: 'GET',
+        headers: {
+            'Authorization': 'Bearer ' + access_token
+        }
+    };
+
+    // Set up the request
+    var get_req = https.request(get_options, function(res) {
+        res.setEncoding('utf8');
+        res.on('data', function (chunk) {
+            console.log('Response: ' + chunk);
+        });
+    });
+
+    get_req.end();
+  }
   
   /* Functions to handle each command. */
   
@@ -202,6 +226,26 @@ module.exports = function(context, cb) {
       });
     } else {
       cb(null, 'Volume command just recives an argument with range is 0-100');
+    }
+  }
+
+
+  function whatson(len) {
+    if(len == 1) {
+      redisGet(redisAccessToken).then(()=> {
+        if(access_token != -1){
+          GetSong().then((data)=> {
+            cb(null, util.format('You are currently listening to %s%', data.item.name));  
+          });
+          
+        } else{
+            cb(null, 'Please, login first.');
+        }
+      }).catch(()=> {
+        console.log('');
+      });
+    } else {
+      cb(null, 'Whatson command does not recive any parameters.');
     }
   }
   

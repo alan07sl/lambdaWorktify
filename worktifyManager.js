@@ -231,7 +231,7 @@ var getSong = new Promise((resolve, reject) =>{
     if(len == 1) {
       redisGet(redisAccessToken).then(()=> {
         if(access_token != -1){
-           axios.get(apiHost+v1Player,null,{headers: {
+           axios.get(apiHost+v1Player,{headers: {
                       'Authorization': 'Bearer ' + access_token
                   }}).then((response)=> {
             console.log(response);

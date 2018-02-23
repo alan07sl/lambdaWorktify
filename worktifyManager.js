@@ -1,9 +1,9 @@
-var util = require('util');
-var querystring = require('querystring');
-var http = require('http');
-var https = require('https');
-var fs = require('fs');
-var redis = require('redis');
+const util = require('util');
+const querystring = require('querystring');
+const http = require('http');
+const https = require('https');
+const fs = require('fs');
+const redis = require('redis');
 const axios = require('axios@0.15.2')
 
 
@@ -22,6 +22,7 @@ module.exports = function(context, cb) {
   const spotifyAccountServicePath = '/api/token';
 
   const apiHost = 'api.spotify.com';
+  const httpsHost = 'https://' + apiHost;
   const v1Player = '/v1/me/player'
   const volumePath = v1Player + '/volume?volume_percent=';
 
@@ -145,28 +146,6 @@ module.exports = function(context, cb) {
     post_req.write(post_data);
     post_req.end();
   }
-
-  function PutVolume(volume) {
-
-    // An object of options to indicate where to post to
-    var put_options = {
-        host: apiHost,
-        path: volumePath + volume,
-        method: 'PUT',
-        headers: {
-            'Authorization': 'Bearer ' + access_token
-        }
-    };
-
-    // Set up the request
-    var put_req = https.request(put_options, function(res) {
-        res.setEncoding('utf8');
-        res.on('data', function (chunk) {
-            console.log('Response: ' + chunk);
-        });
-    });
-    put_req.end();
-  }
   
   /* Functions to handle each command. */
   
@@ -198,8 +177,13 @@ module.exports = function(context, cb) {
     if(argsArray.length == 2 && percentage >= 0 && percentage<= 100) {
       redisGet(redisAccessToken).then((access_token)=> {
         if(access_token != -1){
-          PutVolume(percentage);
-          cb(null, util.format('You set the volume to %d%.', percentage));
+          axios.put(httpsHost + volumePath + percentage,{headers: {
+                      'Authorization': 'Bearer ' + access_token
+                  }}).then((response)=> {
+            cb(null, util.format('You set the volume to %d%.', percentage));  
+          }).catch(()=>{
+            console.log('Cant reach Spotify API.')
+          });
         } else{
             cb(null, 'Please, login first.');
         }
@@ -215,11 +199,9 @@ module.exports = function(context, cb) {
     if(len == 1) {
       redisGet(redisAccessToken).then((access_token)=> {
         if(access_token != -1){
-          console.log(apiHost+v1Player);
-           axios.get('https://'+apiHost+v1Player,{headers: {
+           axios.get(httpsHost + v1Player,{headers: {
                       'Authorization': 'Bearer ' + access_token
                   }}).then((response)=> {
-            console.log(response);
             cb(null, util.format('You are currently listening to %s from %s.', response.data.item.name, response.data.item.artists[0].name));  
           }).catch(()=>{
             console.log('Cant reach Spotify API.')

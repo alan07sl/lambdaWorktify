@@ -80,7 +80,7 @@ module.exports = function(context, cb) {
           volume(argsArray);
           break;
         case 'whatson':
-          whatson();
+          whatson(arrayLen);
           break;
         case 'oncall on':
           cb(null, 'Set oncall on');

@@ -167,7 +167,7 @@ module.exports = function(context, cb) {
     put_req.end();
   }    
   
-  function GetSong() {
+ let getSong = new Promise(function(resolve, reject){
 
     // An object of options to indicate where to post to
     var get_options = {
@@ -178,17 +178,16 @@ module.exports = function(context, cb) {
             'Authorization': 'Bearer ' + access_token
         }
     };
-
-    // Set up the request
+    // do a thing, possibly async, then…
     var get_req = https.request(get_options, function(res) {
         res.setEncoding('utf8');
         res.on('data', function (chunk) {
             console.log('Response: ' + chunk);
         });
+        resolve(res.data);
     });
-
-    get_req.end();
-  }
+    //get_req.end();
+  });
   
   /* Functions to handle each command. */
   

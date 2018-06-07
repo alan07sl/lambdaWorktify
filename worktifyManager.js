@@ -31,6 +31,9 @@ module.exports = function(context, cb) {
   const redisPassword = context.secrets.redis_password;
   const redisAccessToken = 'access_token';
 
+  const buildings = "palermo1,palermo2,ramos1,ramos2".split(",")
+  const params = context.data
+  
   var token_type;
   var scope;
   var expires_in;
@@ -70,6 +73,7 @@ module.exports = function(context, cb) {
       var argsArray = args.split(" ");
       var command = argsArray[0];
       var arrayLen = argsArray.length;
+      var user = params.user_name;
 
       switch (command) {
         case 'login':

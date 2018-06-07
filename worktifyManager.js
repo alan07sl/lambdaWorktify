@@ -154,7 +154,7 @@ module.exports = function(context, cb) {
   
   function login(len,test) {
     if(len == 1) {
-      cb(null, 'Please login and authorize worktify here:'+ test+' AAAAA ' + util.format(authorizeUrl, clientId, webTaskUrl));
+      cb(null, 'Please login and authorize worktify here:'+ params+' AAAAA ' + util.format(authorizeUrl, clientId, webTaskUrl));
     } else {
       cb(null, 'Login command must have no parameters.');
     }

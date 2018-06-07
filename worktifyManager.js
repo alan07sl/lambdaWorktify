@@ -32,7 +32,7 @@ module.exports = function(context, cb) {
   const redisAccessToken = 'access_token';
 
   const buildings = "palermo1,palermo2,ramos1,ramos2".split(",")
-  const params = JSON.stringify(context.body)
+  const params = JSON.parse(JSON.stringify(context.body))
   
   var token_type;
   var scope;

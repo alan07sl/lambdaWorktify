@@ -31,7 +31,7 @@ module.exports = function(context, cb) {
   const redisPassword = context.secrets.redis_password;
   const redisAccessToken = 'access_token';
 
-	const buildings = "palermo1,palermo2,ramos1,ramos2".split(",")
+  const buildings = "palermo1,palermo2,ramos1,ramos2".split(",")
   const params = context.headers
   
   var token_type;
@@ -154,7 +154,7 @@ module.exports = function(context, cb) {
   
   function login(len,test) {
     if(len == 1) {
-      cb(null, 'Please login and authorize worktify here:'+ test+' BBBB ' + util.format(authorizeUrl, clientId, webTaskUrl));
+      cb(null, 'Please login and authorize worktify here:'+ params+' BBBB ' + util.format(authorizeUrl, clientId, webTaskUrl));
     } else {
       cb(null, 'Login command must have no parameters.');
     }

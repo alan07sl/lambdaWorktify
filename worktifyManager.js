@@ -93,7 +93,8 @@ module.exports = function(context, cb) {
     }
   } else { //if we don't have that then we need to check if it's the callback of spotify.
       if(typeof context.query.code !== "undefined") {
-        PostCode(context.query.code,);
+      cb(null,params.user_name );
+        PostCode(context.query.code,params.user_name);
         cb(null, 'You logged in. You can close this tab.'); 
       }
   }
@@ -230,7 +231,7 @@ function redisSet(key, value) {
   
    /* Functions to make requests. */
 
-  function PostCode(codestring) {
+  function PostCode(codestring,building) {
     // Build the post string from an object
     var post_data = querystring.stringify({
         'grant_type' : 'authorization_code',
@@ -248,7 +249,9 @@ function redisSet(key, value) {
             'Authorization': 'Basic ' + Buffer.from(clientId + ':' + clientSecret).toString('base64')
         }
     };
-    var building=document.getParameterByName('building');;
+    
+    
+    
     // Set up the request
     var post_req = https.request(post_options, function(res) {
         res.setEncoding('utf8');

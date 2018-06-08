@@ -130,7 +130,7 @@ function redisSet(key, value) {
      Y UTILIZARLO TMB PARA EL LOGIN DE LISTENER
      EN CASO QUE LO SEA SE LO DESLOGUEA DE LOS OTROS LADOS Y SE LE MUESTRA UN MENSAJE AVISANDO
      OTRA ALTERNATIVA MAS FACIL ES ELIMINARLO DE TODOS LADOS Y DESPUES LOGUEARLO EN DONDE DIJO LA ULTIMA VEZ*/
-      //resetUserLogin(user);
+      resetUserLogin(user);
       redisGet(token).then((access_token)=> {
       if(access_token == '-1' || access_token==null ) {
         redisSet(token, user);
@@ -168,9 +168,9 @@ function redisSet(key, value) {
   
    function resetUserLogin(user) {
     	redisSet(user, '-1');
-      buildings.foreach(function(building){
+      /*buildings.foreach(function(building){
       	redisSet(redisAccessToken+building, '-1');
-      });
+      });*/
   }
   
   function volume(argsArray) {

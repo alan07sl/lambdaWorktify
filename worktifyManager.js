@@ -93,8 +93,7 @@ module.exports = function(context, cb) {
     }
   } else { //if we don't have that then we need to check if it's the callback of spotify.
       if(typeof context.query.code !== "undefined") {
-      cb(null,params.user_name );
-        PostCode(context.query.code,params.user_name);
+        PostCode(context.query.code);
         cb(null, 'You logged in. You can close this tab.'); 
       }
   }
@@ -139,7 +138,8 @@ function redisSet(key, value) {
       } else {
         cb(null, access_token+' is already logged.')
       }
-      cb(null, 'Please login and authorize worktify here:' + util.format(authorizeUrl, clientId, webTaskUrl+'&building='+reproductionPlace));
+      localStorage.setItem('building',reproductionPlace);
+      cb(null, 'Please login and authorize worktify here:' + util.format(authorizeUrl, clientId, webTaskUrl));
       });
     } else {
       cb(null, 'Login command must have 1 parameter that is workplace, possible values '+ buildings +'.');
@@ -231,7 +231,8 @@ function redisSet(key, value) {
   
    /* Functions to make requests. */
 
-  function PostCode(codestring,building) {
+  function PostCode(codestring) {
+  	var building =localStorage.getItem('building');
     // Build the post string from an object
     var post_data = querystring.stringify({
         'grant_type' : 'authorization_code',

@@ -191,13 +191,13 @@ function redisSet(key, value) {
                 console.log('Cant reach Spotify API.')
               });
             } else{
-                cb(null, 'Please, login first.');
+                cb(null, 'Please, login first no token.');
             }
           }).catch(()=> {
             console.log('Redis failed getting token.');
           });
         }else{
-        	cb(null, 'Please, login first.');
+        	cb(null, 'Please, login first no building.');
         }
      }).catch(()=> {
           console.log('Redis failed getting users location.');

@@ -93,7 +93,7 @@ module.exports = function(context, cb) {
     }
   } else { //if we don't have that then we need to check if it's the callback of spotify.
       if(typeof context.query.code !== "undefined") {
-        PostCode(context.query.code);
+        PostCode(context.query.code,);
         cb(null, 'You logged in. You can close this tab.'); 
       }
   }
@@ -138,7 +138,7 @@ function redisSet(key, value) {
       } else {
         cb(null, access_token+' is already logged.')
       }
-      cb(null, 'Please login and authorize worktify here:' + util.format(authorizeUrl, clientId, webTaskUrl));
+      cb(null, 'Please login and authorize worktify here:' + util.format(authorizeUrl, clientId, webTaskUrl+'?building='+reproductionPlace));
       });
     } else {
       cb(null, 'Login command must have 1 parameter that is workplace, possible values '+ buildings +'.');
@@ -248,10 +248,7 @@ function redisSet(key, value) {
             'Authorization': 'Basic ' + Buffer.from(clientId + ':' + clientSecret).toString('base64')
         }
     };
-    var building='';
-    redisGet(user).then((buildingObtained)=> {
-    building=buildingObtained;
-    });
+    var building=getParameterByName('building');;
     // Set up the request
     var post_req = https.request(post_options, function(res) {
         res.setEncoding('utf8');

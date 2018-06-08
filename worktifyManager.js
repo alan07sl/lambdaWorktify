@@ -17,7 +17,7 @@ module.exports = function(context, cb) {
     (scopes ? '&scope=' + encodeURIComponent(scopes) : '');
   const clientId = context.secrets.client_id;
   const clientSecret = context.secrets.client_secret;
-  const webTaskUrl = 'https://0883c62a.ngrok.io';//'https://wt-1421b0d761ddd832608482e64eb8e4fc-0.run.webtask.io/worktify-main';
+  const webTaskUrl = 'https://wt-1421b0d761ddd832608482e64eb8e4fc-0.run.webtask.io/worktify-main';
   const spotifyAccountServiceHost = 'accounts.spotify.com';
   const spotifyAccountServicePath = '/api/token';
 

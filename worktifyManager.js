@@ -138,7 +138,7 @@ function redisSet(key, value) {
       } else {
         cb(null, access_token+' is already logged.')
       }
-      cb(null, 'Please login and authorize worktify here:' + util.format(authorizeUrl, clientId, webTaskUrl+'?building='+reproductionPlace));
+      cb(null, 'Please login and authorize worktify here:' + util.format(authorizeUrl, clientId, webTaskUrl+'&building='+reproductionPlace));
       });
     } else {
       cb(null, 'Login command must have 1 parameter that is workplace, possible values '+ buildings +'.');

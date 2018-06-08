@@ -186,12 +186,14 @@ function redisSet(key, value) {
               cb(null, util.format('You set the volume to %d%.', percentage));  
             }).catch(()=>{
               console.log('Cant reach Spotify API.')
+              cb(null, 'BOOM axios.');
             });
           } else{
               cb(null, 'Nobody is logged as Reproducer.');
           }
         }).catch(()=> {
           console.log('Redis failed getting token.');
+          cb(null, 'BOOM.');
         }); 
         }else{
         	cb(null, 'You are not logged in as Listener.');

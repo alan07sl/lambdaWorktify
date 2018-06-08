@@ -127,10 +127,10 @@ function redisSet(key, value) {
     var token =redisAccessToken+reproductionPlace
      if(argsArray.length == 2 && buildings.includes(reproductionPlace)) {
       redisGet(token).then((access_token)=> {
-      if(access_token != '-1') {
-        cb(null, 'Someone is already logged.'+access_token)
-      } else {
+      if(access_token == '-1' || access_token==null ) {
         redisSet(token, '-1');
+      } else {
+        cb(null, 'Someone is already logged.'+access_token)
       }
       cb(null, 'Please login and authorize worktify here:' + util.format(authorizeUrl, clientId, webTaskUrl));
       });

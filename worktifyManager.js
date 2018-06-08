@@ -94,7 +94,7 @@ module.exports = function(context, cb) {
   } else { //if we don't have that then we need to check if it's the callback of spotify.
       if(typeof context.query.code !== "undefined") {
         PostCode(context.query.code,context.query.state);
-        cb(null, 'You logged in. You can close this tab.'+context.query.state); 
+        cb(null, 'You logged in '+context.query.state+' You can close this tab.'); 
       }
   }
 
@@ -191,13 +191,13 @@ function redisSet(key, value) {
                 console.log('Cant reach Spotify API.')
               });
             } else{
-                cb(null, 'Please, login first no token.');
+                cb(null, 'Nobody is loggued as Reproducer.');
             }
           }).catch(()=> {
             console.log('Redis failed getting token.');
           });
         }else{
-        	cb(null, 'Please, login first no building.');
+        	cb(null, 'Please, login first.');
         }
      }).catch(()=> {
           console.log('Redis failed getting users location.');

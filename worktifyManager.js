@@ -184,9 +184,9 @@ function redisSet(key, value) {
                         'Authorization': 'Bearer ' + access_token
                     }}).then(()=> {
               cb(null, util.format('You set the volume to %d%.', percentage));  
-            }).catch(()=>{
+            }).catch((e)=>{
               console.log('Cant reach Spotify API.')
-              cb(null, 'BOOM axios.');
+              cb(null, 'BOOM axios.'+e);
             });
           } else{
               cb(null, 'Nobody is logged as Reproducer.');

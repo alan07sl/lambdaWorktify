@@ -30,6 +30,8 @@ module.exports = function(context, cb) {
   const redisPort = 10642;
   const redisPassword = context.secrets.redis_password;
   const redisAccessToken = 'access_token';
+  const redisReproducer = 'reproducer';
+  const redisListener = 'listener';
 
   const buildings = "palermo1,palermo2,ramos1,ramos2".split(",")
   const params = context.body
@@ -46,24 +48,7 @@ module.exports = function(context, cb) {
       if (err) throw err;
   });
 
-  function redisSet(key, value) {
-    client.set(key, value, redis.print);
-    client.get(key, function (err, reply) {
-          if (err) throw err;
-    });
-  }
-
-  function redisGet(key) {
-    return new Promise((success, err) => {
-      client.get(key, function(error, result) {
-          if (error) 
-            reject(Error("Redis failed."));
-          else {
-            success(result);
-          }
-      });
-    });    
-  }
+  
 
   if(typeof context.body !== "undefined") {
 
@@ -75,8 +60,11 @@ module.exports = function(context, cb) {
       var arrayLen = argsArray.length;
 			var user = params.user_name;
       switch (command) {
-        case 'login':
-          login(arrayLen,user);
+        case 'login_listener':
+          login(argsArray,user);
+          break;
+         case 'login_reproducer':
+          login(argsArray,user);
           break;
         case 'logout':
           logout(arrayLen);
@@ -109,54 +97,44 @@ module.exports = function(context, cb) {
         cb(null, 'You logged in. You can close this tab.'); 
       }
   }
-    
 
-  /* Functions to make requests. */
 
-  function PostCode(codestring) {
-    // Build the post string from an object
-    var post_data = querystring.stringify({
-        'grant_type' : 'authorization_code',
-        'code' : codestring,
-        'redirect_uri' : webTaskUrl
+/* redis functions */
+
+function redisSet(key, value) {
+    client.set(key, value, redis.print);
+    client.get(key, function (err, reply) {
+          if (err) throw err;
     });
-
-    // An object of options to indicate where to post to
-    var post_options = {
-        host: spotifyAccountServiceHost,
-        path: spotifyAccountServicePath,
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': 'Basic ' + Buffer.from(clientId + ':' + clientSecret).toString('base64')
-        }
-    };
-
-    // Set up the request
-    var post_req = https.request(post_options, function(res) {
-        res.setEncoding('utf8');
-        res.on('data', function (chunk) {
-            var obj = JSON.parse(chunk);
-            redisSet(redisAccessToken, obj.access_token);
-            token_type = obj.token_type;
-            scope = obj.scope;
-            expires_in = obj.expires_in;
-            refresh_token = obj.refresh_token;
-        });
-    });
-
-    // post the data
-    post_req.write(post_data);
-    post_req.end();
   }
+
+  function redisGet(key) {
+    return new Promise((success, err) => {
+      client.get(key, function(error, result) {
+          if (error) 
+            reject(Error("Redis failed."));
+          else {
+            success(result);
+          }
+      });
+    });    
+  }
+
+/* Functions to handle each command. */
   
-  /* Functions to handle each command. */
-  
-  function login(len,test) {
-    if(len == 1) {
-      cb(null, 'Please login and authorize worktify here:'+ params.user_name+' dddd ' + util.format(authorizeUrl, clientId, webTaskUrl));
+  function login(argsArray) {
+    var reproductionPlace = argsArray[1];
+     if(argsArray.length == 2 && buildings.includes(reproductionPlace)) {
+      redisGet(redisAccessToken+reproductionPlace).then((access_token)=> {
+      if(access_token == '-1') {
+        redisSet(redisAccessToken+reproductionPlace, '-1');
+      } else {
+        cb(null, 'Someone is already logged.')
+      }
+      cb(null, 'Please login and authorize worktify here:' + util.format(authorizeUrl, clientId, webTaskUrl));
+      });
     } else {
-      cb(null, 'Login command must have no parameters.');
+      cb(null, 'Login command must have 1 parameter that is workplace, possible values '+ buildings +'.');
     }
   }
   
@@ -219,4 +197,43 @@ module.exports = function(context, cb) {
       cb(null, 'Whatson command does not recive any parameters.');
     }
   }
-};
+  
+   /* Functions to make requests. */
+
+  function PostCode(codestring) {
+    // Build the post string from an object
+    var post_data = querystring.stringify({
+        'grant_type' : 'authorization_code',
+        'code' : codestring,
+        'redirect_uri' : webTaskUrl
+    });
+
+    // An object of options to indicate where to post to
+    var post_options = {
+        host: spotifyAccountServiceHost,
+        path: spotifyAccountServicePath,
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': 'Basic ' + Buffer.from(clientId + ':' + clientSecret).toString('base64')
+        }
+    };
+
+    // Set up the request
+    var post_req = https.request(post_options, function(res) {
+        res.setEncoding('utf8');
+        res.on('data', function (chunk) {
+            var obj = JSON.parse(chunk);
+            redisSet(redisAccessToken, obj.access_token);
+            token_type = obj.token_type;
+            scope = obj.scope;
+            expires_in = obj.expires_in;
+            refresh_token = obj.refresh_token;
+        });
+    });
+
+    // post the data
+    post_req.write(post_data);
+    post_req.end();
+  }
+  };

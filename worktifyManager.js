@@ -232,7 +232,7 @@ function redisSet(key, value) {
    /* Functions to make requests. */
 
   function PostCode(codestring,building) {
-  	var building =localStorage.getItem('building');
+ 
     // Build the post string from an object
     var post_data = querystring.stringify({
         'grant_type' : 'authorization_code',

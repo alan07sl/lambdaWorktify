@@ -138,7 +138,11 @@ function redisSet(key, value) {
       } else {
         cb(null, access_token+' is already logged.')
       }
+      try{
       localStorage.setItem('building',reproductionPlace);
+      }catch(e){
+      cb(null, e );
+      }
       cb(null, 'Please login and authorize worktify here:' + util.format(authorizeUrl, clientId, webTaskUrl));
       });
     } else {

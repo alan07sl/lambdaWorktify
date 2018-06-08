@@ -13,7 +13,7 @@ const axios = require('axios@0.15.2')
 */
 module.exports = function(context, cb) {
   const scopes = 'user-modify-playback-state user-read-playback-state';
-  const authorizeUrl = 'https://accounts.spotify.com/authorize?client_id=%s&response_type=code&redirect_uri=%s'+
+  const authorizeUrl = 'https://accounts.spotify.com/authorize?client_id=%s&response_type=code&redirect_uri=%s&state=dsfdsgs'+
     (scopes ? '&scope=' + encodeURIComponent(scopes) : '');
   const clientId = context.secrets.client_id;
   const clientSecret = context.secrets.client_secret;
@@ -70,10 +70,10 @@ module.exports = function(context, cb) {
           logout(arrayLen,user);
           break;
         case 'volume':
-          volume(argsArray,user);
+          volume(argsArray);
           break;
         case 'whatson':
-          whatson(arrayLen,user);
+          whatson(arrayLen);
           break;
         case 'oncall on':
           cb(null, 'Set oncall on');
@@ -93,6 +93,7 @@ module.exports = function(context, cb) {
     }
   } else { //if we don't have that then we need to check if it's the callback of spotify.
       if(typeof context.query.code !== "undefined") {
+        cb(null, context.query.state); 
         PostCode(context.query.code);
         cb(null, 'You logged in. You can close this tab.'); 
       }
@@ -124,7 +125,7 @@ function redisSet(key, value) {
   
   function login_reproducer(argsArray,user) {
     var reproductionPlace = argsArray[1];
-    var token =redisAccessToken+'rep'+reproductionPlace
+    var token =redisAccessToken+reproductionPlace
      if(argsArray.length == 2 && buildings.includes(reproductionPlace)) {
      /*FALTA VALIDAR QUE NO SEA LISTENER O REPRODUCER EN OTRO LADO, LO CUAL SE PUEDE SACAR A UN METODO 
      Y UTILIZARLO TMB PARA EL LOGIN DE LISTENER
@@ -134,14 +135,8 @@ function redisSet(key, value) {
       redisGet(token).then((access_token)=> {
       if(access_token == '-1' || access_token==null ) {
         redisSet(token, user);
-        redisSet(user, reproductionPlace);
       } else {
         cb(null, access_token+' is already logged.')
-      }
-      try{
-      localStorage.setItem('building',reproductionPlace);
-      }catch(e){
-      cb(null, e +localStorage );
       }
       cb(null, 'Please login and authorize worktify here:' + util.format(authorizeUrl, clientId, webTaskUrl));
       });
@@ -176,36 +171,27 @@ function redisSet(key, value) {
     	redisSet(user, '-1');
       buildings.forEach(function(building){
       	redisSet(redisAccessToken+building, '-1');
-        redisSet(redisAccessToken+'rep'+building, '-1');
       });
   }
   
-  function volume(argsArray,user) {
+  function volume(argsArray) {
     var percentage = argsArray[1];
     if(argsArray.length == 2 && percentage >= 0 && percentage<= 100) {
-    	redisGet(user).then((building)=> {
-        if(buildings.includes(building)){
-          redisGet(redisAccessToken+building).then((access_token)=> {
-            if(access_token != -1){
-              axios.put(httpsHost + volumePath + percentage,{},{headers: {
-                          'Authorization': 'Bearer ' + access_token
-                      }}).then(()=> {
-                cb(null, util.format('You set the volume to %d%.', percentage));  
-              }).catch(()=>{
-                console.log('Cant reach Spotify API.')
-              });
-            } else{
-                cb(null, 'Please, login first.');
-            }
-          }).catch(()=> {
-            console.log('Redis failed getting token.');
+      redisGet(redisAccessToken).then((access_token)=> {
+        if(access_token != -1){
+          axios.put(httpsHost + volumePath + percentage,{},{headers: {
+                      'Authorization': 'Bearer ' + access_token
+                  }}).then(()=> {
+            cb(null, util.format('You set the volume to %d%.', percentage));  
+          }).catch(()=>{
+            console.log('Cant reach Spotify API.')
           });
-        }else{
-        	cb(null, 'Please, login first.');
+        } else{
+            cb(null, 'Please, login first.');
         }
-     }).catch(()=> {
-          console.log('Redis failed getting users location.');
-        });
+      }).catch(()=> {
+        console.log('Redis failed.');
+      });
     } else {
       cb(null, 'Volume command just recives an argument with range is 0-100.');
     }
@@ -236,7 +222,6 @@ function redisSet(key, value) {
    /* Functions to make requests. */
 
   function PostCode(codestring) {
-  	var building =localStorage.getItem('building');
     // Build the post string from an object
     var post_data = querystring.stringify({
         'grant_type' : 'authorization_code',
@@ -254,15 +239,13 @@ function redisSet(key, value) {
             'Authorization': 'Basic ' + Buffer.from(clientId + ':' + clientSecret).toString('base64')
         }
     };
-    
-    
-    
+
     // Set up the request
     var post_req = https.request(post_options, function(res) {
         res.setEncoding('utf8');
         res.on('data', function (chunk) {
             var obj = JSON.parse(chunk);
-            redisSet(redisAccessToken+building, obj.access_token);
+            redisSet(redisAccessToken, obj.access_token);
             token_type = obj.token_type;
             scope = obj.scope;
             expires_in = obj.expires_in;

@@ -130,7 +130,7 @@ function redisSet(key, value) {
      Y UTILIZARLO TMB PARA EL LOGIN DE LISTENER
      EN CASO QUE LO SEA SE LO DESLOGUEA DE LOS OTROS LADOS Y SE LE MUESTRA UN MENSAJE AVISANDO
      OTRA ALTERNATIVA MAS FACIL ES ELIMINARLO DE TODOS LADOS Y DESPUES LOGUEARLO EN DONDE DIJO LA ULTIMA VEZ*/
-      //resetUserLogin(user);
+      resetUserLogin(user);
       redisGet(token).then((access_token)=> {
       if(access_token == '-1' || access_token==null ) {
         redisSet(token, user);
@@ -149,7 +149,7 @@ function redisSet(key, value) {
   function login_listener(argsArray,user) {
     var reproductionPlace = argsArray[1];
      if(argsArray.length == 2 && buildings.includes(reproductionPlace)) {
-     		//resetUserLogin(user);
+     		resetUserLogin(user);
         redisSet(user, reproductionPlace);
         cb(null, 'You were logged as listener in '+reproductionPlace);
     } else {
@@ -161,7 +161,7 @@ function redisSet(key, value) {
     if(len == 1) {
     /*SI SE QUIERE SE PUEDE PRIMERO HACER UN GET PARA SABER EN DONDE ESTABA LOGGEADO 
     Y DECIRLE DE DONDE SE LO SACO*/
-    	//resetUserLogin(user);
+    	resetUserLogin(user);
       cb(null, 'Logout success.');
     } else {
       cb(null, 'Logout command must have no parameters.');

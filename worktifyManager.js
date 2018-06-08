@@ -61,13 +61,13 @@ module.exports = function(context, cb) {
 			var user = params.user_name;
       switch (command) {
         case 'login_listener':
-          login(argsArray,user);
+          login_listener(argsArray,user);
           break;
          case 'login_reproducer':
-          login(argsArray,user);
+          login_reproducer(argsArray,user);
           break;
         case 'logout':
-          logout(arrayLen);
+          logout(arrayLen,user);
           break;
         case 'volume':
           volume(argsArray);
@@ -122,10 +122,15 @@ function redisSet(key, value) {
 
 /* Functions to handle each command. */
   
-  function login(argsArray,user) {
+  function login_reproducer(argsArray,user) {
     var reproductionPlace = argsArray[1];
     var token =redisAccessToken+reproductionPlace
      if(argsArray.length == 2 && buildings.includes(reproductionPlace)) {
+     /*FALTA VALIDAR QUE NO SEA LISTENER O REPRODUCER EN OTRO LADO, LO CUAL SE PUEDE SACAR A UN METODO 
+     Y UTILIZARLO TMB PARA EL LOGIN DE LISTENER
+     EN CASO QUE LO SEA SE LO DESLOGUEA DE LOS OTROS LADOS Y SE LE MUESTRA UN MENSAJE AVISANDO
+     OTRA ALTERNATIVA MAS FACIL ES ELIMINARLO DE TODOS LADOS Y DESPUES LOGUEARLO EN DONDE DIJO LA ULTIMA VEZ*/
+      resetUserLogin(user);
       redisGet(token).then((access_token)=> {
       if(access_token == '-1' || access_token==null ) {
         redisSet(token, user);
@@ -139,19 +144,33 @@ function redisSet(key, value) {
     }
   }
   
-  function logout(len) {
+  function login_listener(argsArray,user) {
+    var reproductionPlace = argsArray[1];
+     if(argsArray.length == 2 && buildings.includes(reproductionPlace)) {
+     		resetUserLogin(user);
+        redisSet(user, reproductionPlace);
+        cb(null, 'You were logged as listener in '+reproductionPlace);
+    } else {
+      cb(null, 'Login command must have 1 parameter that is workplace, possible values '+ buildings +'.');
+    }
+  }
+  
+  function logout(len,user) {
     if(len == 1) {
-      redisGet(redisAccessToken).then((access_token)=> {
-      if(access_token != '-1') {
-        redisSet(redisAccessToken, '-1');
-      } else {
-        cb(null, 'You were not logged in.')
-      }
-      cb(null, 'You have logged out, thanks for using worktify.');
-      });
+    /*SI SE QUIERE SE PUEDE PRIMERO HACER UN GET PARA SABER EN DONDE ESTABA LOGGEADO 
+    Y DECIRLE DE DONDE SE LO SACO*/
+    	resetUserLogin(user);
+      cb(null, 'Logout success.');
     } else {
       cb(null, 'Logout command must have no parameters.');
     }
+  }
+  
+   function resetUserLogin(user) {
+    	redisSet(user, '-1');
+      buildings.foreach(function(building){
+      	redisSet(redisAccessToken+building, '-1');
+      });
   }
   
   function volume(argsArray) {

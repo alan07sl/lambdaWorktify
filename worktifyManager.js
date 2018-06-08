@@ -128,7 +128,7 @@ function redisSet(key, value) {
      if(argsArray.length == 2 && buildings.includes(reproductionPlace)) {
       redisGet(token).then((access_token)=> {
       if(access_token != '-1') {
-        cb(null, 'Someone is already logged.')
+        cb(null, 'Someone is already logged.'+access_token)
       } else {
         redisSet(token, '-1');
       }

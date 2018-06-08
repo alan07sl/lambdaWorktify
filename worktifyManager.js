@@ -171,7 +171,7 @@ function redisSet(key, value) {
    function resetUserLogin(user) {
     	redisSet(user, '-1');
       buildings.forEach(function(building){
-       	redisGet(redisAccessToken+building).then((reproducer)=> {
+       	redisGet(redisAccessToken+'Reproducer'+building).then((reproducer)=> {
         	if(user==reproducer){ 
               redisSet(redisAccessToken+building, '-1');
               redisSet(redisAccessToken+'Reproducer'+building, '-1');

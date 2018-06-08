@@ -70,10 +70,10 @@ module.exports = function(context, cb) {
           logout(arrayLen,user);
           break;
         case 'volume':
-          volume(argsArray,user);
+          volume(argsArray);
           break;
         case 'whatson':
-          whatson(arrayLen,user);
+          whatson(arrayLen);
           break;
         case 'oncall on':
           cb(null, 'Set oncall on');
@@ -124,7 +124,7 @@ function redisSet(key, value) {
   
   function login_reproducer(argsArray,user) {
     var reproductionPlace = argsArray[1];
-    var token =redisAccessToken+reproductionPlace
+    var token =redisAccessToken+'rep'+reproductionPlace
      if(argsArray.length == 2 && buildings.includes(reproductionPlace)) {
      /*FALTA VALIDAR QUE NO SEA LISTENER O REPRODUCER EN OTRO LADO, LO CUAL SE PUEDE SACAR A UN METODO 
      Y UTILIZARLO TMB PARA EL LOGIN DE LISTENER
@@ -134,6 +134,7 @@ function redisSet(key, value) {
       redisGet(token).then((access_token)=> {
       if(access_token == '-1' || access_token==null ) {
         redisSet(token, user);
+        redisSet(user, reproductionPlace);
       } else {
         cb(null, access_token+' is already logged.')
       }
@@ -157,6 +158,8 @@ function redisSet(key, value) {
   
   function logout(len,user) {
     if(len == 1) {
+    /*SI SE QUIERE SE PUEDE PRIMERO HACER UN GET PARA SABER EN DONDE ESTABA LOGGEADO 
+    Y DECIRLE DE DONDE SE LO SACO*/
     	resetUserLogin(user);
       cb(null, 'Logout success.');
     } else {
@@ -165,42 +168,31 @@ function redisSet(key, value) {
   }
   
    function resetUserLogin(user) {
-   /*SI SE QUIERE SE PUEDE PRIMERO HACER UN GET PARA SABER EN DONDE ESTABA LOGGEADO 
-    Y DECIRLE DE DONDE SE LO SACO*/
     	redisSet(user, '-1');
       buildings.forEach(function(building){
       	redisSet(redisAccessToken+building, '-1');
+        redisSet(redisAccessToken+'rep'+building, '-1');
       });
   }
   
-  function volume(argsArray,user) {
+  function volume(argsArray) {
     var percentage = argsArray[1];
     if(argsArray.length == 2 && percentage >= 0 && percentage<= 100) {
-      redisGet(user).then((reproductionPlace)=> {
-      if(reproductionPlace != '-1' && reproductionPlace!=null){
-        redisGet(redisAccessToken+reproductionPlace).then((access_token)=> {
-          if(access_token != -1){
-            axios.put(httpsHost + volumePath + percentage,{},{headers: {
-                        'Authorization': 'Bearer ' + access_token
-                    }}).then(()=> {
-              cb(null, util.format('You set the volume to %d%.', percentage));  
-            }).catch((e)=>{
-              console.log('Cant reach Spotify API.')
-              cb(null, 'BOOM axios.'+e);
-            });
-          } else{
-              cb(null, 'Nobody is logged as Reproducer.');
-          }
-        }).catch(()=> {
-          console.log('Redis failed getting token.');
-          cb(null, 'BOOM.');
-        }); 
-        }else{
-        	cb(null, 'You are not logged in as Listener.');
+      redisGet(redisAccessToken).then((access_token)=> {
+        if(access_token != -1){
+          axios.put(httpsHost + volumePath + percentage,{},{headers: {
+                      'Authorization': 'Bearer ' + access_token
+                  }}).then(()=> {
+            cb(null, util.format('You set the volume to %d%.', percentage));  
+          }).catch(()=>{
+            console.log('Cant reach Spotify API.')
+          });
+        } else{
+            cb(null, 'Please, login first.');
         }
-     }).catch(()=> {
-          console.log('Redis failed getting reproduction place.');
-        });
+      }).catch(()=> {
+        console.log('Redis failed.');
+      });
     } else {
       cb(null, 'Volume command just recives an argument with range is 0-100.');
     }
@@ -248,13 +240,16 @@ function redisSet(key, value) {
             'Authorization': 'Basic ' + Buffer.from(clientId + ':' + clientSecret).toString('base64')
         }
     };
-
+    var building='';
+    redisGet(user).then((buildingObtained)=> {
+    building=buildingObtained;
+    });
     // Set up the request
     var post_req = https.request(post_options, function(res) {
         res.setEncoding('utf8');
         res.on('data', function (chunk) {
             var obj = JSON.parse(chunk);
-            redisSet(redisAccessToken, obj.access_token);
+            redisSet(redisAccessToken+building, obj.access_token);
             token_type = obj.token_type;
             scope = obj.scope;
             expires_in = obj.expires_in;

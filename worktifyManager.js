@@ -70,10 +70,10 @@ module.exports = function(context, cb) {
           logout(arrayLen,user);
           break;
         case 'volume':
-          volume(argsArray);
+          volume(argsArray,user);
           break;
         case 'whatson':
-          whatson(arrayLen);
+          whatson(arrayLen,user);
           break;
         case 'oncall on':
           cb(null, 'Set oncall on');
@@ -175,24 +175,32 @@ function redisSet(key, value) {
       });
   }
   
-  function volume(argsArray) {
+  function volume(argsArray,user) {
     var percentage = argsArray[1];
     if(argsArray.length == 2 && percentage >= 0 && percentage<= 100) {
-      redisGet(redisAccessToken).then((access_token)=> {
-        if(access_token != -1){
-          axios.put(httpsHost + volumePath + percentage,{},{headers: {
-                      'Authorization': 'Bearer ' + access_token
-                  }}).then(()=> {
-            cb(null, util.format('You set the volume to %d%.', percentage));  
-          }).catch(()=>{
-            console.log('Cant reach Spotify API.')
+    	redisGet(user).then((building)=> {
+        if(buildings.includes(building)){
+          redisGet(redisAccessToken+building).then((access_token)=> {
+            if(access_token != -1){
+              axios.put(httpsHost + volumePath + percentage,{},{headers: {
+                          'Authorization': 'Bearer ' + access_token
+                      }}).then(()=> {
+                cb(null, util.format('You set the volume to %d%.', percentage));  
+              }).catch(()=>{
+                console.log('Cant reach Spotify API.')
+              });
+            } else{
+                cb(null, 'Please, login first.');
+            }
+          }).catch(()=> {
+            console.log('Redis failed getting token.');
           });
-        } else{
-            cb(null, 'Please, login first.');
+        }else{
+        	cb(null, 'Please, login first.');
         }
-      }).catch(()=> {
-        console.log('Redis failed.');
-      });
+     }).catch(()=> {
+          console.log('Redis failed getting users location.');
+        });
     } else {
       cb(null, 'Volume command just recives an argument with range is 0-100.');
     }

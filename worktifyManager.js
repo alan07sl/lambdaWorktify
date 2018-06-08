@@ -168,9 +168,9 @@ function redisSet(key, value) {
   
    function resetUserLogin(user) {
     	redisSet(user, '-1');
-      /*buildings.foreach(function(building){
+      buildings.forEach(function(building){
       	redisSet(redisAccessToken+building, '-1');
-      });*/
+      });
   }
   
   function volume(argsArray) {

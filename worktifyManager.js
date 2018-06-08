@@ -43,7 +43,7 @@ module.exports = function(context, cb) {
 
   /* Redis Client */
 
-  var client = redis.createClient(redisPort, redisHostname, {no_ready_check: true});
+  const client = redis.createClient(redisPort, redisHostname, {no_ready_check: true});
   client.auth(redisPassword, function (err) {
       if (err) throw err;
   });
@@ -70,10 +70,10 @@ module.exports = function(context, cb) {
           logout(arrayLen,user);
           break;
         case 'volume':
-          volume(argsArray);
+          volume(argsArray,user);
           break;
         case 'whatson':
-          whatson(arrayLen);
+          whatson(arrayLen,user);
           break;
         case 'oncall on':
           cb(null, 'Set oncall on');
@@ -157,8 +157,6 @@ function redisSet(key, value) {
   
   function logout(len,user) {
     if(len == 1) {
-    /*SI SE QUIERE SE PUEDE PRIMERO HACER UN GET PARA SABER EN DONDE ESTABA LOGGEADO 
-    Y DECIRLE DE DONDE SE LO SACO*/
     	resetUserLogin(user);
       cb(null, 'Logout success.');
     } else {
@@ -167,30 +165,40 @@ function redisSet(key, value) {
   }
   
    function resetUserLogin(user) {
+   /*SI SE QUIERE SE PUEDE PRIMERO HACER UN GET PARA SABER EN DONDE ESTABA LOGGEADO 
+    Y DECIRLE DE DONDE SE LO SACO*/
     	redisSet(user, '-1');
       buildings.forEach(function(building){
       	redisSet(redisAccessToken+building, '-1');
       });
   }
   
-  function volume(argsArray) {
+  function volume(argsArray,user) {
     var percentage = argsArray[1];
     if(argsArray.length == 2 && percentage >= 0 && percentage<= 100) {
-      redisGet(redisAccessToken).then((access_token)=> {
-        if(access_token != -1){
-          axios.put(httpsHost + volumePath + percentage,{},{headers: {
-                      'Authorization': 'Bearer ' + access_token
-                  }}).then(()=> {
-            cb(null, util.format('You set the volume to %d%.', percentage));  
-          }).catch(()=>{
-            console.log('Cant reach Spotify API.')
-          });
-        } else{
-            cb(null, 'Please, login first.');
+      redisGet(user).then((reproductionPlace)=> {
+      if(reproductionPlace != '-1' && reproductionPlace!=null){
+        redisGet(redisAccessToken+reproductionPlace).then((access_token)=> {
+          if(access_token != -1){
+            axios.put(httpsHost + volumePath + percentage,{},{headers: {
+                        'Authorization': 'Bearer ' + access_token
+                    }}).then(()=> {
+              cb(null, util.format('You set the volume to %d%.', percentage));  
+            }).catch(()=>{
+              console.log('Cant reach Spotify API.')
+            });
+          } else{
+              cb(null, 'Nobody is logged as Reproducer.');
+          }
+        }).catch(()=> {
+          console.log('Redis failed getting token.');
+        }); 
+        }else{
+        	cb(null, 'You are not logged in as Listener.');
         }
-      }).catch(()=> {
-        console.log('Redis failed.');
-      });
+     }).catch(()=> {
+          console.log('Redis failed getting reproduction place.');
+        });
     } else {
       cb(null, 'Volume command just recives an argument with range is 0-100.');
     }

@@ -248,7 +248,7 @@ function redisSet(key, value) {
             'Authorization': 'Basic ' + Buffer.from(clientId + ':' + clientSecret).toString('base64')
         }
     };
-    var building=getParameterByName('building');;
+    var building=document.getParameterByName('building');;
     // Set up the request
     var post_req = https.request(post_options, function(res) {
         res.setEncoding('utf8');

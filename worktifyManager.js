@@ -124,12 +124,13 @@ function redisSet(key, value) {
   
   function login(argsArray) {
     var reproductionPlace = argsArray[1];
+    var token =redisAccessToken+reproductionPlace
      if(argsArray.length == 2 && buildings.includes(reproductionPlace)) {
-      redisGet(redisAccessToken+reproductionPlace).then((access_token)=> {
-      if(access_token == '-1') {
-        redisSet(redisAccessToken+reproductionPlace, '-1');
-      } else {
+      redisGet(token).then((access_token)=> {
+      if(access_token != '-1') {
         cb(null, 'Someone is already logged.')
+      } else {
+        redisSet(token, '-1');
       }
       cb(null, 'Please login and authorize worktify here:' + util.format(authorizeUrl, clientId, webTaskUrl));
       });

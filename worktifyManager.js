@@ -141,7 +141,7 @@ function redisSet(key, value) {
       try{
       localStorage.setItem('building',reproductionPlace);
       }catch(e){
-      cb(null, e );
+      cb(null, e +localStorage );
       }
       cb(null, 'Please login and authorize worktify here:' + util.format(authorizeUrl, clientId, webTaskUrl));
       });

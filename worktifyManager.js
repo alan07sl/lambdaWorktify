@@ -108,7 +108,20 @@ function redisSet(key, value) {
     });
   }
 
+function redisDelete(key){
+	return new Promise((success, err) => {
+      client.del(key, function(error, result) {
+          if (error) 
+            reject(Error("Redis failed."));
+          else {
+            success(result);
+          }
+      });
+    });
+}
+
   function redisGet(key) {
+  	
     return new Promise((success, err) => {
       client.get(key, function(error, result) {
           if (error) 
@@ -169,13 +182,13 @@ function redisSet(key, value) {
   }
   
    function resetUserLogin(user) {
-    	redisSet(user, '-1');
-      buildings.forEach(function(building){
+    	redisDelete(user);
+      	buildings.forEach(function(building){
        	redisGet(redisAccessToken+'Reproducer'+building).then((reproducer)=> {
        		cb(null, "Reproducer: "+ reproducer);
         	if(user==reproducer){ 
-              redisSet(redisAccessToken+building, '-1');
-              redisSet(redisAccessToken+'Reproducer'+building, '-1');
+              redisDelete(redisAccessToken+building);
+              redisDelete(redisAccessToken+'Reproducer'+building, '-1');
            }
         }).catch(()=> {
           console.log('Redis failed getting token.');

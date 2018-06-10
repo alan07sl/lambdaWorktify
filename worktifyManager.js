@@ -178,7 +178,7 @@ module.exports = function(context, cb) {
   
 	function resetUserLogin(user) {
     	redisSet(user, '-1');
-      buildings.forEach(function(building){
+      	buildings.forEach(function(building){
        	redisGet(redisAccessToken+'Reproducer'+building).then((reproducer)=> {
         	if(user==reproducer){ 
               redisSet(redisAccessToken+building, '-1');
@@ -188,13 +188,14 @@ module.exports = function(context, cb) {
           console.log('Redis failed getting token.');
         });
       });
-  }
+  	}
 
-   	/*function resetUserLogin(user) {
+   	function resetUserLogin(user) {
     	redisDelete(user);
       	buildings.forEach(function(building){
 	       	redisGet(redisAccessToken+'Reproducer'+building).then((reproducer)=> {
 	       		cb(null, "Reproducer: "+ reproducer);
+	       		cb(null, "User: "+ user);
 	        	if(user == reproducer){ 
               		redisDelete(redisAccessToken+building);
 	              	redisDelete(redisAccessToken+'Reproducer'+building);
@@ -203,7 +204,7 @@ module.exports = function(context, cb) {
 	          	console.log('Redis failed getting token.');
 	        });
       	});
-  	}*/
+  	}
   
   	function volume(argsArray,user) {
 	    var percentage = argsArray[1];

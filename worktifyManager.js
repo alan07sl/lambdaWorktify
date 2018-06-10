@@ -122,16 +122,15 @@ module.exports = function(context, cb) {
 	}
 
 	function redisGet(key) {
-
 		return new Promise((success, err) => {
-		client.get(key, function(error, result) {
-		  	if (error) 
-		    	reject(Error("Redis failed."));
-		  	else {
-		    	success(result);
-		  	}
-		});
-	});    
+			client.get(key, function(error, result) {
+			  	if (error) 
+			    	reject(Error("Redis failed."));
+			  	else {
+			    	success(result);
+			  	}
+			});
+		});    
 	}
 
 /* Functions to handle each command. */
@@ -177,7 +176,21 @@ module.exports = function(context, cb) {
 		}
 	}
   
-   	function resetUserLogin(user) {
+	function resetUserLogin(user) {
+    	redisSet(user, '-1');
+      buildings.forEach(function(building){
+       	redisGet(redisAccessToken+'Reproducer'+building).then((reproducer)=> {
+        	if(user==reproducer){ 
+              redisSet(redisAccessToken+building, '-1');
+              redisSet(redisAccessToken+'Reproducer'+building, '-1');
+           }
+        }).catch(()=> {
+          console.log('Redis failed getting token.');
+        });
+      });
+  }
+
+   	/*function resetUserLogin(user) {
     	redisDelete(user);
       	buildings.forEach(function(building){
 	       	redisGet(redisAccessToken+'Reproducer'+building).then((reproducer)=> {
@@ -190,7 +203,7 @@ module.exports = function(context, cb) {
 	          	console.log('Redis failed getting token.');
 	        });
       	});
-  	}
+  	}*/
   
   	function volume(argsArray,user) {
 	    var percentage = argsArray[1];

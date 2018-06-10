@@ -139,7 +139,6 @@ module.exports = function(context, cb) {
 	    var reproductionPlace = argsArray[1];
 	    var token = redisAccessToken+'Reproducer'+reproductionPlace
 	 	if(argsArray.length == 2 && buildings.includes(reproductionPlace)) {
-	      	//resetUserLogin(user);
 	      	redisGet(token).then((access_token)=> {
 		      	if(access_token == '-1' || access_token == null) {
 		        	redisSet(token, user);
@@ -157,9 +156,13 @@ module.exports = function(context, cb) {
 	function login_listener(argsArray,user) {
 	    var reproductionPlace = argsArray[1];
 		if(argsArray.length == 2 && buildings.includes(reproductionPlace)) {
-	 		//resetUserLogin(user);
-	        redisSet(user, reproductionPlace);
-	        cb(null, 'You were logged as listener in '+reproductionPlace);
+			redisGet(user).then((userValue)=>{
+				if(userValue != '-1')
+					c(null, "You are already logged")
+				else
+					redisSet(user, reproductionPlace);
+		        	cb(null, 'You were logged as listener in '+reproductionPlace);	
+			});
 	    } else {
 			cb(null, 'Login command must have 1 parameter that is workplace, possible values '+ buildings +'.');
 	    }

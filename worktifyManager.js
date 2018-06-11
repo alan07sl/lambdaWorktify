@@ -8,6 +8,7 @@ const axios = require('axios@0.15.2')
 
 
 
+
 /**
  * @param context {WebtaskContext}
  */
@@ -291,6 +292,13 @@ module.exports = function(context, cb) {
     /* Functions to make requests. */
 
     function PostCode(codestring,building) {
+
+				//validate timeout
+        redisGet(timeoutLogin+building).then((timeout)=> {
+                  if( timeout!=null && new Date()>=new Date(timeout)) {
+                  cb(null, 'Your session timedout, you have to login again.');
+                  }
+            	});
 
         // Build the post string from an object
         var post_data = querystring.stringify({

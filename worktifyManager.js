@@ -5,7 +5,6 @@ const https = require('https');
 const fs = require('fs');
 const redis = require('redis');
 const axios = require('axios@0.15.2')
-const moment = require('moment.js')
 
 
 
@@ -145,7 +144,7 @@ module.exports = function(context, cb) {
                   if( access_token == null||timeout==null||new Date()>=new Date(timeout)) {
                       redisSet(token, user);
                       redisSet(user, reproductionPlace);
-                      redisSet(timeoutLogin+reproductionPlace, moment(new Date()).add(5, 'm').toDate());
+                      redisSet(timeoutLogin+reproductionPlace, new Date(new Date().getTime() + 5*60000));
                   } else {
                       cb(null, access_token+' is already logged.')
                   }

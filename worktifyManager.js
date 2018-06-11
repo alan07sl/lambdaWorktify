@@ -77,7 +77,7 @@ module.exports = function(context, cb) {
                     whatson(arrayLen,user);
                     break;
                 case 'help':
-                    cb(null, "asdf \n "/*getHelp()*/);
+                    cb(null, "asdf "+\n /*getHelp()*/);
                     break;
                 default:
                     cb(null,'For more usage information please use: /worktify help');

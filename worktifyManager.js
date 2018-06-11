@@ -177,8 +177,7 @@ module.exports = function(context, cb) {
         }
     }
     
-     function logoutAdmin(argsArray,user) {     
-cb(null, user);   
+     function logoutAdmin(argsArray,user) {       
       if(admins.includes(user)) {
                 resetUserLogin(argsArray[1]);
                 cb(null, 'Logout success for '+argsArray[1]);

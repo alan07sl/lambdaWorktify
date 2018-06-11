@@ -34,7 +34,7 @@ module.exports = function(context, cb) {
     const redisListener = 'listener';
 
     const buildings = "palermo1,palermo2,ramos1,ramos2".split(",")
-    const admins = "matias.devoto,alanfrnk,axel".split(",")
+    const admins = "matias.devoto,alan.hryniewicz,axel.escalada".split(",")
     const params = context.body
 
     var token_type;
@@ -177,8 +177,7 @@ module.exports = function(context, cb) {
         }
     }
     
-     function logoutAdmin(argsArray,user) {
-      cb(null, argsArray[1]);        
+     function logoutAdmin(argsArray,user) {        
       if(admins.includes(user)) {
                 resetUserLogin(argsArray[1]);
                 cb(null, 'Logout success for '+argsArray[1]);

@@ -171,8 +171,6 @@ module.exports = function(context, cb) {
   
 	function logout(len,user) {
 		if(len == 1) {
-		    /*SI SE QUIERE SE PUEDE PRIMERO HACER UN GET PARA SABER EN DONDE ESTABA LOGGEADO 
-		    Y DECIRLE DE DONDE SE LO SACO*/
 			resetUserLogin(user);
 		  	cb(null, 'Logout success.');
 		} else {

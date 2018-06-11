@@ -95,8 +95,8 @@ module.exports = function(context, cb) {
     } else { //if we don't have that then we need to check if it's the callback of spotify.
         if(typeof context.query.code !== "undefined") {
         //validate timeout
-        redisGet(timeoutLogin+context.query.state).then((timeout)=> {
-                  if( timeout!=null && new Date()>=new Date(timeout)) {
+        redisGet(timeoutLogin+building).then((timeout)=> {
+                  if( timeout!=null && new Date()<=new Date(timeout)) {
                   cb(null, 'Your session timedout, you have to login again.');
                   }
             	});

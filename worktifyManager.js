@@ -159,7 +159,6 @@ module.exports = function(context, cb) {
         if(argsArray.length == 2 && buildings.includes(reproductionPlace)) {
             resetUserLogin(user);
             redisGet(user).then((userValue)=>{
-                cb(null, "user: " +userValue);
                 if(userValue == null){
                     redisSet(user, reproductionPlace);
                     cb(null, 'You were logged as listener in '+reproductionPlace);
@@ -183,11 +182,20 @@ module.exports = function(context, cb) {
     function resetUserLogin(user) {
         redisGet(user).then((building)=> {
             if(building != null && building !='-1'){
-                redisDelete(redisAccessToken+building);
-                redisDelete(redisAccessToken+'Reproducer'+building);
+		redisGet(redisAccessToken+'Reproducer'+building).then((userReproducing)=> {
+			if(user == userReproducing){
+				redisDelete(redisAccessToken+building);
+				redisDelete(redisAccessToken+'Reproducer'+building);
+			}
+ 		}).catch(()=>{
+                                console.log('Redis failed getting token.')
+                                cb(null, 'Ups, we got a problem.');
+                            });
+
             }
         }).catch(()=> {
             console.log('Redis failed getting token.');
+	    cb(null, 'Ups, we got a problem.');
         });
         redisDelete(user);
     }

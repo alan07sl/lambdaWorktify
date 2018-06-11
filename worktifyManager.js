@@ -100,7 +100,7 @@ module.exports = function(context, cb) {
                     cb(null, 'Your session timedout, you have to login again.');
                   }else{
 		    PostCode(context.query.code,context.query.state);
-		    cb(null, new Date()+'You logged in '+context.query.state+' You can close this tab.'+new Date(timeout));
+		    cb(null, 'You logged in '+context.query.state+' You can close this tab.');
 		}
             	});
             

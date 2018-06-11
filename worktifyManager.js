@@ -205,7 +205,7 @@ module.exports = function(context, cb) {
 			            	    cb(null, util.format('You set the volume to %d%.', percentage));  
 			              	}).catch(()=>{
 				                console.log('Cant reach Spotify API.')
-                        cb(null, 'Ups, we got a problem2.'+access_token);
+                        cb(null, 'Ups, we got a problem2.'+building+redisAccessToken);
 			            	});
 			            } else{
 			                cb(null, 'Nobody is loggued as Reproducer.');

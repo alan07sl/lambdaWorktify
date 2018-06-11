@@ -77,9 +77,9 @@ module.exports = function(context, cb) {
                     whatson(arrayLen,user);
                     break;
                 case 'help':
-                    cb(null, `Commands:
-		/worktify login_reproducer <building>
-		/worktify login_listener <building>
+                    cb(null, `Commands:"
+"/worktify login_reproducer <building>"
+"/worktify login_listener <building>
 		/worktify logout
 		/worktify volume <0-100>
 		/worktify whatson`);

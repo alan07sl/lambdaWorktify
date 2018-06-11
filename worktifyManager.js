@@ -262,7 +262,7 @@ module.exports = function(context, cb) {
     }
 
      function getHelp(){
-        return "Commands:'\n'/worktify login_reproducer <building>";
+        return 'Commands:"\n"/worktify login_reproducer <building>';
     }
 
     /* Functions to make requests. */

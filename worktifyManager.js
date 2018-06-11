@@ -159,10 +159,9 @@ module.exports = function(context, cb) {
 		if(argsArray.length == 2 && buildings.includes(reproductionPlace)) {
     	resetUserLogin(user);
 			redisGet(user).then((userValue)=>{
-				cb(null, "user: " +userValue);
 				if(userValue == null){
 					redisSet(user, reproductionPlace);
-		        	cb(null, 'You were logged as listener in '+reproductionPlace);	
+		        		cb(null, 'You were logged as listener in '+reproductionPlace);	
 				}else
 					cb(null, 'You are already logged');
 			});

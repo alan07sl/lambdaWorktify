@@ -5,6 +5,7 @@ const https = require('https');
 const fs = require('fs');
 const redis = require('redis');
 const axios = require('axios@0.15.2')
+const moment = require('moment.js')
 
 
 
@@ -34,8 +35,9 @@ module.exports = function(context, cb) {
     const redisListener = 'listener';
 
     const buildings = "palermo1,palermo2,ramos1,ramos2".split(",")
-    const admins = "matias.devoto,alan.hryniewicz,axel.escalada".split(",")
+    const admins = "matias.devoto,alanfrnk,axel".split(",")
     const params = context.body
+    const timeoutLogin="timeoutLogin"
 
     var token_type;
     var scope;
@@ -139,13 +141,16 @@ module.exports = function(context, cb) {
         if(argsArray.length == 2 && buildings.includes(reproductionPlace)) {
             resetUserLogin(user);
             redisGet(token).then((access_token)=> {
-                if(access_token == '-1' || access_token == null) {
-                    redisSet(token, user);
-                    redisSet(user, reproductionPlace);
-                } else {
-                    cb(null, access_token+' is already logged.')
-                }
-                cb(null, 'Please login and authorize worktify here:' + util.format(authorizeUrl, clientId, webTaskUrl,reproductionPlace));
+            	redisGet(timeoutLogin+reproductionPlace).then((timeout)=> {
+                  if( access_token == null||timeout==null||new Date()>=new Date(timeout)) {
+                      redisSet(token, user);
+                      redisSet(user, reproductionPlace);
+                      redisSet(timeoutLogin+reproductionPlace, moment(new Date()).add(5, 'm').toDate());
+                  } else {
+                      cb(null, access_token+' is already logged.')
+                  }
+                  cb(null, 'Please login and authorize worktify here:' + util.format(authorizeUrl, clientId, webTaskUrl,reproductionPlace));
+            	});
             });
         } else {
             cb(null, 'Login command must have 1 parameter that is workplace, possible values '+ buildings +'.');
@@ -177,7 +182,8 @@ module.exports = function(context, cb) {
         }
     }
     
-     function logoutAdmin(argsArray,user) {       
+     function logoutAdmin(argsArray,user) {
+      cb(null, argsArray[1]);        
       if(admins.includes(user)) {
                 resetUserLogin(argsArray[1]);
                 cb(null, 'Logout success for '+argsArray[1]);
@@ -188,7 +194,7 @@ module.exports = function(context, cb) {
 
     function resetUserLogin(user) {
         redisGet(user).then((building)=> {
-            if(building != null && building !='-1'){
+            if(building != null){
 		redisGet(redisAccessToken+'Reproducer'+building).then((userReproducing)=> {
 			if(user == userReproducing){
 				redisDelete(redisAccessToken+building);
@@ -213,7 +219,7 @@ module.exports = function(context, cb) {
             redisGet(user).then((building)=> {
                 if(buildings.includes(building)){
                     redisGet(redisAccessToken+building).then((access_token)=> {
-                        if(access_token != -1 && access_token != null){
+                        if(access_token != null){
                             axios.put(httpsHost + volumePath + percentage,{},{headers: {
                                     'Authorization': 'Bearer ' + access_token
                                 }}).then(()=> {
@@ -246,7 +252,7 @@ module.exports = function(context, cb) {
             redisGet(user).then((building)=> {
                 if(buildings.includes(building)){
                     redisGet(redisAccessToken+building).then((access_token)=> {
-                        if(access_token != -1 && access_token != null){
+                        if( access_token != null){
                             axios.get(httpsHost + v1Player,{headers: {
                                     'Authorization': 'Bearer ' + access_token
                                 }}).then((response)=> {

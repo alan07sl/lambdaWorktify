@@ -139,6 +139,7 @@ module.exports = function(context, cb) {
 	    var reproductionPlace = argsArray[1];
 	    var token = redisAccessToken+'Reproducer'+reproductionPlace
 	 	if(argsArray.length == 2 && buildings.includes(reproductionPlace)) {
+    			resetUserLogin(user);
 	      	redisGet(token).then((access_token)=> {
 		      	if(access_token == '-1' || access_token == null) {
 		        	redisSet(token, user);
@@ -156,12 +157,13 @@ module.exports = function(context, cb) {
 	function login_listener(argsArray,user) {
 	    var reproductionPlace = argsArray[1];
 		if(argsArray.length == 2 && buildings.includes(reproductionPlace)) {
+    	resetUserLogin(user);
 			redisGet(user).then((userValue)=>{
 				cb(null, "user: " +userValue);
-				if(userValue == null)
+				if(userValue == null){
 					redisSet(user, reproductionPlace);
 		        	cb(null, 'You were logged as listener in '+reproductionPlace);	
-				else
+				}else
 					cb(null, 'You are already logged');
 			});
 	    } else {
@@ -179,19 +181,15 @@ module.exports = function(context, cb) {
 	}
   
    	function resetUserLogin(user) {
-    	redisDelete(user);
-      	buildings.forEach(function(building){
-	       	redisGet(redisAccessToken+'Reproducer'+building).then((reproducer)=> {
-	       		cb(null, "Reproducer: "+ reproducer);
-	       		cb(null, "User: "+ user);
-	        	if(user == reproducer){ 
+    	redisGet(user).then((building)=> {
+	        	if(building != null && building !='-1'){ 
               		redisDelete(redisAccessToken+building);
 	              	redisDelete(redisAccessToken+'Reproducer'+building);
 	           	}
 	        }).catch(()=> {
 	          	console.log('Redis failed getting token.');
 	        });
-      	});
+      redisDelete(user);
   	}
   
   	function volume(argsArray,user) {

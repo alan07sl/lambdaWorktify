@@ -96,7 +96,7 @@ module.exports = function(context, cb) {
         if(typeof context.query.code !== "undefined") {
         //validate timeout
         redisGet(timeoutLogin+context.query.state).then((timeout)=> {
-                  if( timeout!=null && new Date()<=new Date(timeout)) {
+                  if( timeout!=null && new Date()==new Date(timeout)) {
                     cb(null, 'Your session timedout, you have to login again.');
                   }else{
 		    PostCode(context.query.code,context.query.state);

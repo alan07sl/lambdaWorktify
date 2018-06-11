@@ -34,6 +34,7 @@ module.exports = function(context, cb) {
     const redisListener = 'listener';
 
     const buildings = "palermo1,palermo2,ramos1,ramos2".split(",")
+    const admins = "matias.devoto,alanfrnk,axel".split(",")
     const params = context.body
 
     var token_type;
@@ -69,6 +70,9 @@ module.exports = function(context, cb) {
                     break;
                 case 'logout':
                     logout(arrayLen,user);
+                    break;
+                case 'logout_admin':
+                    logoutAdmin(argsArray,user);
                     break;
                 case 'volume':
                     volume(argsArray,user);
@@ -170,6 +174,15 @@ module.exports = function(context, cb) {
             cb(null, 'Logout success.');
         } else {
             cb(null, 'Logout command must have no parameters.');
+        }
+    }
+    
+     function logoutAdmin(argsArray,user) {
+        if(admins.includes(user)) {
+            resetUserLogin(argsArray[1]);
+            cb(null, 'Logout success for '+argsArray[1]);
+        } else {
+            cb(null, 'For more usage information please use: /worktify help');
         }
     }
 
@@ -311,4 +324,3 @@ module.exports = function(context, cb) {
         post_req.write(post_data);
         post_req.end();
     }
-};

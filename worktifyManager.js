@@ -261,7 +261,7 @@ module.exports = function(context, cb) {
         }
     }
 
-     function redisDelete(key){
+     function getHelp(){
         return 'Commands:'+
 '/worktify login_reproducer <building>'+
 '/worktify login_listener <building>'+

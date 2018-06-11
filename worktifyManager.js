@@ -76,14 +76,8 @@ module.exports = function(context, cb) {
                 case 'whatson':
                     whatson(arrayLen,user);
                     break;
-                case 'oncall on':
-                    cb(null, 'Set oncall on');
-                    break;
-                case 'oncall off':
-                    cb(null, 'Set oncall off');
-                    break;
                 case 'help':
-                    cb(null, 'Help text.');
+                    cb(null, getHelp());
                     break;
                 default:
                     cb(null,'For more usage information please use: /worktify help');
@@ -159,7 +153,6 @@ module.exports = function(context, cb) {
         if(argsArray.length == 2 && buildings.includes(reproductionPlace)) {
             resetUserLogin(user);
             redisGet(user).then((userValue)=>{
-                cb(null, "user: " +userValue);
                 if(userValue == null){
                     redisSet(user, reproductionPlace);
                     cb(null, 'You were logged as listener in '+reproductionPlace);
@@ -183,11 +176,20 @@ module.exports = function(context, cb) {
     function resetUserLogin(user) {
         redisGet(user).then((building)=> {
             if(building != null && building !='-1'){
-                redisDelete(redisAccessToken+building);
-                redisDelete(redisAccessToken+'Reproducer'+building);
+		redisGet(redisAccessToken+'Reproducer'+building).then((userReproducing)=> {
+			if(user == userReproducing){
+				redisDelete(redisAccessToken+building);
+				redisDelete(redisAccessToken+'Reproducer'+building);
+			}
+ 		}).catch(()=>{
+                                console.log('Redis failed getting token.')
+                                cb(null, 'Ups, we got a problem.');
+                            });
+
             }
         }).catch(()=> {
             console.log('Redis failed getting token.');
+	    cb(null, 'Ups, we got a problem.');
         });
         redisDelete(user);
     }
@@ -257,6 +259,15 @@ module.exports = function(context, cb) {
         } else {
             cb(null, 'Whatson command does not recive any parameters.');
         }
+    }
+
+     function getHelp(){
+        return 'Commands: +char(13)+char(10)+'+String.fromCharCode(10)+String.fromCharCode(13)+
+'/worktify login_reproducer <building>'+String.fromCharCode(10)+String.fromCharCode(13)+
+'/worktify login_listener <building>'+String.fromCharCode(10)+String.fromCharCode(13)+
+'/worktify logout'+String.fromCharCode(10)+String.fromCharCode(13)+
+'/worktify volume <0-100>'+String.fromCharCode(10)+String.fromCharCode(13)+
+'/worktify whatson';
     }
 
     /* Functions to make requests. */

@@ -77,7 +77,12 @@ module.exports = function(context, cb) {
                     whatson(arrayLen,user);
                     break;
                 case 'help':
-                    cb(null, getHelp());
+                    cb(null, `Commands:
+		/worktify login_reproducer <building>
+		/worktify login_listener <building>
+		/worktify logout
+		/worktify volume <0-100>
+		/worktify whatson`);
                     break;
                 default:
                     cb(null,'For more usage information please use: /worktify help');
@@ -262,12 +267,12 @@ module.exports = function(context, cb) {
     }
 
      function getHelp(){
-        return Regex.Unescape(`Commands:
+        return `Commands:
 		/worktify login_reproducer <building>
 		/worktify login_listener <building>
 		/worktify logout
 		/worktify volume <0-100>
-		/worktify whatson`);
+		/worktify whatson`;
     }
 
     /* Functions to make requests. */

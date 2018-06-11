@@ -178,13 +178,13 @@ module.exports = function(context, cb) {
     }
     
      function logoutAdmin(argsArray,user) {
-	cb(null, argsArray[1]);        
-	if(admins.includes(user)) {
-            resetUserLogin(argsArray[1]);
-            cb(null, 'Logout success for '+argsArray[1]);
-        } else {
-            cb(null, 'For more usage information please use: /worktify help');
-        }
+      cb(null, argsArray[1]);        
+      if(admins.includes(user)) {
+                resetUserLogin(argsArray[1]);
+                cb(null, 'Logout success for '+argsArray[1]);
+            } else {
+                cb(null, 'For more usage information please use: /worktify help');
+            }
     }
 
     function resetUserLogin(user) {
@@ -325,3 +325,4 @@ module.exports = function(context, cb) {
         post_req.write(post_data);
         post_req.end();
     }
+}

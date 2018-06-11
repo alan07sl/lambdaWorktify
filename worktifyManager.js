@@ -157,11 +157,12 @@ module.exports = function(context, cb) {
 	function login_listener(argsArray,user) {
 	    var reproductionPlace = argsArray[1];
 		if(argsArray.length == 2 && buildings.includes(reproductionPlace)) {
-    			resetUserLogin(user);
+    	resetUserLogin(user);
 			redisGet(user).then((userValue)=>{
+				cb(null, "user: " +userValue);
 				if(userValue == null){
-				redisSet(user, reproductionPlace);
-		        		cb(null, 'You were logged as listener in '+reproductionPlace);	
+					redisSet(user, reproductionPlace);
+		        	cb(null, 'You were logged as listener in '+reproductionPlace);	
 				}else
 					cb(null, 'You are already logged');
 			});
@@ -204,18 +205,21 @@ module.exports = function(context, cb) {
 			            	    cb(null, util.format('You set the volume to %d%.', percentage));  
 			              	}).catch(()=>{
 				                console.log('Cant reach Spotify API.')
+                        cb(null, 'Ups, we got a problem.');
 			            	});
 			            } else{
 			                cb(null, 'Nobody is loggued as Reproducer.');
 			            }
 	          		}).catch(()=> {
 	            		console.log('Redis failed getting token.');
+                  cb(null, 'Ups, we got a problem.');
 	          		});
 		        }else{
 		        	cb(null, 'Please, login first.');
 		        }
 	     	}).catch(()=> {
 	          	console.log('Redis failed getting users location.');
+              cb(null, 'Ups, we got a problem.');
 	    	});
 	    } else {
 	      	cb(null, 'Volume command just recives an argument with range is 0-100.');

@@ -77,12 +77,7 @@ module.exports = function(context, cb) {
                     whatson(arrayLen,user);
                     break;
                 case 'help':
-                    cb(null,`@axel Commands:
- /worktify login_reproducer <building>
-/worktify login_listener <building>
-/worktify logout
-/worktify volume <0-100>
-/worktify whatson`);
+                    cb(null,getHelp());
                     break;
                 default:
                     cb(null,'For more usage information please use: /worktify help');
@@ -267,12 +262,12 @@ module.exports = function(context, cb) {
     }
 
      function getHelp(){
-        return `Commands:
-		/worktify login_reproducer <building>
-		/worktify login_listener <building>
-		/worktify logout
-		/worktify volume <0-100>
-		/worktify whatson`;
+        return "Commands:"+
+		"/worktify login_reproducer <building>"+
+		"/worktify login_listener <building>"+
+		"/worktify logout"+
+		"/worktify volume <0-100>"+
+		"/worktify whatson";
     }
 
     /* Functions to make requests. */

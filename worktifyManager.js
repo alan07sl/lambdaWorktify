@@ -198,14 +198,14 @@ module.exports = function(context, cb) {
 	    	redisGet(user).then((building)=> {
 		        if(buildings.includes(building)){
 		          	redisGet(redisAccessToken+building).then((access_token)=> {
-		            	if(access_token != -1){
+		            	if(access_token != -1 && access_token != null){
 			              	axios.put(httpsHost + volumePath + percentage,{},{headers: {
 			                          'Authorization': 'Bearer ' + access_token
 			              	}}).then(()=> {
 			            	    cb(null, util.format('You set the volume to %d%.', percentage));  
 			              	}).catch(()=>{
 				                console.log('Cant reach Spotify API.')
-                        cb(null, 'Ups, we got a problem2.'+building+redisAccessToken);
+                        cb(null, 'Ups, we got a problem.');
 			            	});
 			            } else{
 			                cb(null, 'Nobody is loggued as Reproducer.');

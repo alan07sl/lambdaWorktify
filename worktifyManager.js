@@ -97,11 +97,13 @@ module.exports = function(context, cb) {
         //validate timeout
         redisGet(timeoutLogin+context.query.state).then((timeout)=> {
                   if( timeout!=null && new Date()<=new Date(timeout)) {
-                  cb(null, 'Your session timedout, you have to login again.');
-                  }
+                    cb(null, 'Your session timedout, you have to login again.');
+                  }else{
+		    PostCode(context.query.code,context.query.state);
+		    cb(null, 'You logged in '+context.query.state+' You can close this tab.');
+		}
             	});
-            PostCode(context.query.code,context.query.state);
-            cb(null, 'You logged in '+context.query.state+' You can close this tab.');
+            
         }
     }
 

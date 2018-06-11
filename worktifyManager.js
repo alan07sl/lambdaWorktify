@@ -262,12 +262,12 @@ module.exports = function(context, cb) {
     }
 
      function getHelp(){
-        return 'Commands:'+
-'/worktify login_reproducer <building>'+
-'/worktify login_listener <building>'+
-'/worktify logout'+
-'/worktify volume <0-100>'+
-'/worktify whatson';
+        return 'Commands:\n'+
+'/worktify login_reproducer <building>\n'+
+'/worktify login_listener <building>\n'+
+'/worktify logout\n'+
+'/worktify volume <0-100>\n'+
+'/worktify whatson\n';
     }
 
     /* Functions to make requests. */

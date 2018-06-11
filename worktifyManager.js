@@ -157,12 +157,11 @@ module.exports = function(context, cb) {
 	function login_listener(argsArray,user) {
 	    var reproductionPlace = argsArray[1];
 		if(argsArray.length == 2 && buildings.includes(reproductionPlace)) {
-    	resetUserLogin(user);
+    			resetUserLogin(user);
 			redisGet(user).then((userValue)=>{
-				cb(null, "user: " +userValue);
 				if(userValue == null){
-					redisSet(user, reproductionPlace);
-		        	cb(null, 'You were logged as listener in '+reproductionPlace);	
+				redisSet(user, reproductionPlace);
+		        		cb(null, 'You were logged as listener in '+reproductionPlace);	
 				}else
 					cb(null, 'You are already logged');
 			});

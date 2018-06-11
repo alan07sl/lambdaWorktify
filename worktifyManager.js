@@ -227,7 +227,7 @@ module.exports = function(context, cb) {
     }
 
     function whatson(len,user) {
-        if(len == 2 ) {
+        if(len == 1 ) {
             redisGet(user).then((building)=> {
                 if(buildings.includes(building)){
                     redisGet(redisAccessToken+building).then((access_token)=> {

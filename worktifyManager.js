@@ -158,11 +158,11 @@ module.exports = function(context, cb) {
 		if(argsArray.length == 2 && buildings.includes(reproductionPlace)) {
 			redisGet(user).then((userValue)=>{
 				cb(null, "user: " +userValue);
-				if(userValue != '{}')
-					cb(null, 'You are already logged');
-				else
+				if(userValue == null)
 					redisSet(user, reproductionPlace);
 		        	cb(null, 'You were logged as listener in '+reproductionPlace);	
+				else
+					cb(null, 'You are already logged');
 			});
 	    } else {
 			cb(null, 'Login command must have 1 parameter that is workplace, possible values '+ buildings +'.');

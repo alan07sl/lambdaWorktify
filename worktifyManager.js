@@ -262,7 +262,12 @@ module.exports = function(context, cb) {
     }
 
      function getHelp(){
-        return "Commands:\nlogin_reproducer";
+        return 'Commands: \t '+
+		'/worktify login_reproducer <building>'+
+		'/worktify login_listener <building>'+
+		'/worktify logout'+
+		'/worktify volume <0-100>'+
+		'/worktify whatson';
     }
 
     /* Functions to make requests. */

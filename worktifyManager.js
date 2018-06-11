@@ -262,12 +262,12 @@ module.exports = function(context, cb) {
     }
 
      function getHelp(){
-        return 'Commands:'+String.fromCharCode(13)+
-'/worktify login_reproducer <building>'+String.fromCharCode(13)+
-'/worktify login_listener <building>'+String.fromCharCode(13)+
-'/worktify logout'+String.fromCharCode(13)+
-'/worktify volume <0-100>'+String.fromCharCode(13)+
-'/worktify whatson'+String.fromCharCode(13);
+        return 'Commands:'+String.fromCharCode(10)+String.fromCharCode(13)+
+'/worktify login_reproducer <building>'+String.fromCharCode(10)+String.fromCharCode(13)+
+'/worktify login_listener <building>'+String.fromCharCode(10)+String.fromCharCode(13)+
+'/worktify logout'+String.fromCharCode(10)+String.fromCharCode(13)+
+'/worktify volume <0-100>'+String.fromCharCode(10)+String.fromCharCode(13)+
+'/worktify whatson';
     }
 
     /* Functions to make requests. */

@@ -76,14 +76,8 @@ module.exports = function(context, cb) {
                 case 'whatson':
                     whatson(arrayLen,user);
                     break;
-                case 'oncall on':
-                    cb(null, 'Set oncall on');
-                    break;
-                case 'oncall off':
-                    cb(null, 'Set oncall off');
-                    break;
                 case 'help':
-                    cb(null, 'Help text.');
+                    cb(null, getHelp());
                     break;
                 default:
                     cb(null,'For more usage information please use: /worktify help');
@@ -265,6 +259,15 @@ module.exports = function(context, cb) {
         } else {
             cb(null, 'Whatson command does not recive any parameters.');
         }
+    }
+
+     function redisDelete(key){
+        return 'Commands:'+
+'/worktify login_reproducer <building>'+
+'/worktify login_listener <building>'+
+'/worktify logout'+
+'/worktify volume <0-100>'+
+'/worktify whatson';
     }
 
     /* Functions to make requests. */

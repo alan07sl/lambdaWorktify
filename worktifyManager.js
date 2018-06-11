@@ -94,6 +94,12 @@ module.exports = function(context, cb) {
         }
     } else { //if we don't have that then we need to check if it's the callback of spotify.
         if(typeof context.query.code !== "undefined") {
+        //validate timeout
+        redisGet(timeoutLogin+building).then((timeout)=> {
+                  if( timeout!=null && new Date()>=new Date(timeout)) {
+                  cb(null, 'Your session timedout, you have to login again.');
+                  }
+            	});
             PostCode(context.query.code,context.query.state);
             cb(null, 'You logged in '+context.query.state+' You can close this tab.');
         }
@@ -292,13 +298,6 @@ module.exports = function(context, cb) {
     /* Functions to make requests. */
 
     function PostCode(codestring,building) {
-
-				//validate timeout
-        redisGet(timeoutLogin+building).then((timeout)=> {
-                  if( timeout!=null && new Date()>=new Date(timeout)) {
-                  cb(null, 'Your session timedout, you have to login again.');
-                  }
-            	});
 
         // Build the post string from an object
         var post_data = querystring.stringify({

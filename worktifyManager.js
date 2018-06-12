@@ -234,21 +234,21 @@ module.exports = function(context, cb) {
                                 cb(null, util.format('You set the volume to %d%.', percentage));
                             }).catch((e)=>{
                                 console.log('Cant reach Spotify API.')
-                                cb(null, 'Ups, we got a problem1.'+e);
+                                cb(null, 'Ups, we got a problem');
                             });
                         } else{
                             cb(null, 'Nobody is loggued as Reproducer.');
                         }
                     }).catch(()=> {
                         console.log('Redis failed getting token.');
-                        cb(null, 'Ups, we got a problem2.');
+                        cb(null, 'Ups, we got a problem.');
                     });
                 }else{
                     cb(null, 'Please, login first.');
                 }
             }).catch(()=> {
                 console.log('Redis failed getting users location.');
-                cb(null, 'Ups, we got a problem3.');
+                cb(null, 'Ups, we got a problem.');
             });
         } else {
             cb(null, 'Volume command just recives an argument with range is 0-100.');
@@ -274,7 +274,7 @@ module.exports = function(context, cb) {
                         }
                     }).catch(()=> {
                         console.log('Redis failed getting token.');
-                        cb(null, 'Ups, we got a problem1.');
+                        cb(null, 'Ups, we got a problem.');
                     });
                 }else{
                     cb(null, 'Please, login first.');

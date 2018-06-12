@@ -44,7 +44,7 @@ module.exports = function(context, cb) {
       }
     });
 	});   
-  
+  cb(null, '');
     /* redis functions */
 
     function redisSet(key, value) {

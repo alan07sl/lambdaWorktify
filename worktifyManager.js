@@ -38,6 +38,7 @@ module.exports = function(context, cb) {
     const admins = "matias.devoto,alanfrnk,axel".split(",")
     const params = context.body
     const timeoutLogin="timeoutLogin"
+    const tokenRefresh="tokenRefresh";
 
     var token_type;
     var scope;
@@ -207,6 +208,7 @@ module.exports = function(context, cb) {
 			if(user == userReproducing){
 				redisDelete(redisAccessToken+building);
 				redisDelete(redisAccessToken+'Reproducer'+building);
+        redisDelete(tokenRefresh+building);
 			}
  		}).catch(()=>{
                                 console.log('Redis failed getting token.')
@@ -330,7 +332,7 @@ module.exports = function(context, cb) {
                 token_type = obj.token_type;
                 scope = obj.scope;
                 expires_in = obj.expires_in;
-                refresh_token = obj.refresh_token;
+                redisSet(tokenRefresh+building, obj.refresh_token);
             });
         });
 

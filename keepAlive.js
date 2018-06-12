@@ -4,10 +4,6 @@ const https = require('https');
 const fs = require('fs');
 const redis = require('redis');
 
-
-
-
-
 /**
  * @param context {WebtaskContext}
  */

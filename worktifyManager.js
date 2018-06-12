@@ -222,8 +222,8 @@ module.exports = function(context, cb) {
     }
 
     function volume(argsArray,user) {
-        var percentage = parseInt(argsArray[1], 10);
-        if(argsArray.length == 2 && percentage >= 0 && percentage<= 100) {
+        var percentage = argsArray[1];
+        if(argsArray.length == 2 && isInt(percentage) && percentage >= 0 && percentage<= 100) {
             redisGet(user).then((building)=> {
                 if(buildings.includes(building)){
                     redisGet(redisAccessToken+building).then((access_token)=> {
@@ -251,7 +251,7 @@ module.exports = function(context, cb) {
                 cb(null, 'Ups, we got a problem.');
             });
         } else {
-            cb(null, 'Volume command just recives an argument with range is 0-100.');
+            cb(null, 'Volume command just recives an argument with range is 0-100.'+isInt(percentage));
         }
     }
 
@@ -338,4 +338,10 @@ module.exports = function(context, cb) {
         post_req.write(post_data);
         post_req.end();
     }
+
+	function isInt(value) {
+	  return !isNaN(value) && 
+		 parseInt(Number(value)) == value && 
+		 !isNaN(parseInt(value, 10));
+	}
 }

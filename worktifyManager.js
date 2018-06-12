@@ -232,23 +232,23 @@ module.exports = function(context, cb) {
                                     'Authorization': 'Bearer ' + access_token
                                 }}).then(()=> {
                                 cb(null, util.format('You set the volume to %d%.', percentage));
-                            }).catch(()=>{
+                            }).catch((e)=>{
                                 console.log('Cant reach Spotify API.')
-                                cb(null, 'Ups, we got a problem.');
+                                cb(null, 'Ups, we got a problem1.'+e);
                             });
                         } else{
                             cb(null, 'Nobody is loggued as Reproducer.');
                         }
                     }).catch(()=> {
                         console.log('Redis failed getting token.');
-                        cb(null, 'Ups, we got a problem1.');
+                        cb(null, 'Ups, we got a problem2.');
                     });
                 }else{
                     cb(null, 'Please, login first.');
                 }
             }).catch(()=> {
                 console.log('Redis failed getting users location.');
-                cb(null, 'Ups, we got a problem.');
+                cb(null, 'Ups, we got a problem3.');
             });
         } else {
             cb(null, 'Volume command just recives an argument with range is 0-100.');

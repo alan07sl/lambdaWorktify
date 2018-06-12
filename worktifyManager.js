@@ -223,7 +223,7 @@ module.exports = function(context, cb) {
 
     function volume(argsArray,user) {
         var percentage = argsArray[1];
-        if(argsArray.length == 2 && percentage >== 0 && percentage<== 100) {
+        if(argsArray.length == 2 && typeof percentage == 'number'&& percentage >= 0 && percentage<= 100) {
             redisGet(user).then((building)=> {
                 if(buildings.includes(building)){
                     redisGet(redisAccessToken+building).then((access_token)=> {

@@ -251,7 +251,7 @@ module.exports = function(context, cb) {
                 cb(null, 'Ups, we got a problem.');
             });
         } else {
-            cb(null, 'Volume command just recives an argument with range is 0-100.');
+            cb(null, 'Volume command just recives an argument with range is 0-100.' +percentage+ Number.isInteger(percentage));
         }
     }
 

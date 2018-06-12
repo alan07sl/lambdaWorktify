@@ -236,7 +236,7 @@ module.exports = function(context, cb) {
                                 cb(null, util.format('You set the volume to %d%.', percentage));
                             }).catch((e)=>{
                                 console.log('Cant reach Spotify API.')
-                                cb(null, 'Ups, we got a problem');
+                                cb(null, 'is the Reproducer playing something?');
                             });
                         } else{
                             cb(null, 'Nobody is loggued as Reproducer.');
@@ -269,7 +269,7 @@ module.exports = function(context, cb) {
                                 cb(null, util.format('You are currently listening to %s from %s.', response.data.item.name, response.data.item.artists[0].name));
                             }).catch(()=>{
                                 console.log('Cant reach Spotify API.')
-                                cb(null, 'Ups, we got a problem.');
+                                cb(null, 'is the Reproducer playing something?');
                             });
                         } else{
                             cb(null, 'Nobody is loggued as Reproducer.');
